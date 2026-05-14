@@ -16,9 +16,15 @@ export interface Product {
   slug?: string;
   updated_at: string;
   startDate?: string;
+  //campos nuevos para limpieza
+  unit?: string; // Unidad de medida
+  barcode?: string; // Código de barras
+  minstock?: number; // Stock mínimo
+  supplierid?: string; // ID proveedor
   //campos agregados no propios del producto en su tabla
   main_image?: string;
   category_name?: string;
+  supplier_name?: string; // Nombre del proveedor
   total_stock?: number; //stock total en todas las sucursales
   branchId?: string; //id de la sucursal si es que se obtiene por sucursal
 }
@@ -42,6 +48,10 @@ export interface ProductType {
   description: string;
   brand?: string;
   categoryId: string;
+  unit?: string; // Unidad de medida
+  barcode?: string; // Código de barras
+  minstock?: number; // Stock mínimo
+  supplierid?: string; // ID proveedor
 
   // superset de ambos schemas
   images?: FileList | null;

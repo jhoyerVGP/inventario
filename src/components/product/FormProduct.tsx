@@ -21,6 +21,7 @@ import { useEffect } from "react";
 
 interface CreateProductProps {
   categories: CategoryType[];
+  suppliers?: any[]; // Suppliers list
   funParent: (data: ProductInputService) => void;
   initialData?: ProductType;
   mode: "create" | "update" | "view";
@@ -28,6 +29,7 @@ interface CreateProductProps {
 
 const FormProduct = ({
   categories,
+  suppliers = [],
   funParent,
   initialData,
   mode,
@@ -60,6 +62,10 @@ const FormProduct = ({
         cost: initialData.cost,
         description: initialData.description,
         categoryId: initialData.categoryId,
+        unit: initialData.unit ?? "",
+        barcode: initialData.barcode ?? "",
+        minstock: initialData.minstock ?? 0,
+        supplierid: initialData.supplierid ?? "",
 
         // imágenes existentes
         imageExisting: initialData.imageExisting,
@@ -73,6 +79,23 @@ const FormProduct = ({
     value: cat.id,
     label: cat.nameCat,
   }));
+
+  // Opciones de unidades de medida
+  const unitOptions = [
+    { value: "Unidad", label: "Unidad" },
+    { value: "Litro", label: "Litro" },
+    { value: "ml", label: "ml" },
+    { value: "Kg", label: "Kg" },
+    { value: "Gramo", label: "Gramo" },
+    { value: "Caja", label: "Caja" },
+    { value: "Paquete", label: "Paquete" },
+  ];
+
+  // Opciones de proveedores
+  const supplierOptions = suppliers.map((s) => ({
+    value: s.id,
+    label: s.name,
+  })) || [];
 
   // Función helper para transformar los datos
   function transformProductData(data: ProductType) {
@@ -160,6 +183,54 @@ const FormProduct = ({
               disabled: mode === "view",
               placeholder: "samsung",
             }}
+          />
+        </div>
+
+        {/* Nuevos campos: Unidad, Barcode, Stock Mínimo, Proveedor */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <FormSelect
+            label="Unidad de Medida"
+            name="unit"
+            control={control}
+            options={unitOptions}
+            placeholder="Seleccionar unidad"
+            errors={errors}
+            disabled={mode === "view"}
+          />
+          <FormInput
+            label="Código de Barras"
+            name="barcode"
+            register={register}
+            errors={errors}
+            inputProps={{
+              type: "text",
+              placeholder: "1234567890123",
+              disabled: mode === "view",
+            }}
+          />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <FormInput
+            label="Stock Mínimo"
+            name="minstock"
+            register={register}
+            errors={errors}
+            inputProps={{
+              type: "number",
+              min: 0,
+              placeholder: "10",
+              disabled: mode === "view",
+            }}
+          />
+          <FormSelect
+            label="Proveedor"
+            name="supplierid"
+            control={control}
+            options={supplierOptions}
+            placeholder="Seleccionar proveedor"
+            errors={errors}
+            disabled={mode === "view"}
           />
         </div>
 

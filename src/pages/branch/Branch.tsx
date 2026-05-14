@@ -15,8 +15,9 @@ import { AlertDelete } from "@/components/common/AlertDelet";
 //context de la surcursal
 import { useBranch } from "@/context/BranchContext";
 import { Branches } from "@/components/branch/Branches";
-import { SkeletonCard } from "@/components/common/SkeletonCard";
 import Error from "@/components/common/Error";
+import { EmptyBranches } from "@/components/branch/EmptyBranches";
+import { SkeletonBranches } from "@/components/branch/SkeletonBranches";
 
 const Branch = () => {
   //context sucursal
@@ -132,12 +133,16 @@ const Branch = () => {
         </div>
 
         {/* Grid */}
-        <Branches
-          branches={branches}
-          setBranchS={setBranchS}
-          handleOpenModal={handleOpenModal}
-          handleOpenAlertDelete={handleOpenAlertDelete}
-        />
+        {branches && branches.length > 0 && (
+          <Branches
+            branches={branches}
+            setBranchS={setBranchS}
+            handleOpenModal={handleOpenModal}
+            handleOpenAlertDelete={handleOpenAlertDelete}
+          />
+        )}
+
+        {branches && branches.length === 0 && <EmptyBranches />}
       </div>
 
       {/* Modal con el formulario para agregar o editar una sucursal */}
@@ -162,7 +167,7 @@ const Branch = () => {
         nameDelete={branchS?.branch_name}
       />
 
-      {isLoading && <SkeletonCard />}
+      {isLoading && <SkeletonBranches />}
 
       {isError && <Error />}
     </div>

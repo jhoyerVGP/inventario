@@ -241,7 +241,7 @@ const InputFile = ({
                   loading="lazy"
                   src={url}
                   alt={`Preview ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-gray-50"
                 />
 
                 {/* Overlay con botón eliminar */}
@@ -268,7 +268,7 @@ const InputFile = ({
                 <img
                   src={preview.url}
                   alt={`Preview ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-gray-50"
                 />
 
                 {/* Overlay con botón eliminar */}

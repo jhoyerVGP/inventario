@@ -29,6 +29,10 @@ export const productFormSchema = z
       .string({ message: "La categoría es obligatoria" })
       .nonempty("La categoría es obligatoria")
       .min(1, "La categoría es obligatoria"),
+    unit: z.string().optional(),
+    barcode: z.string().optional(),
+    minstock: z.coerce.number().min(0, "Stock mínimo no puede ser negativo").optional(),
+    supplierid: z.string().optional(),
     images: z
       .instanceof(FileList, {
         message: "Debes seleccionar al menos una imagen",
@@ -96,6 +100,12 @@ export const productFormSchemaUpdate = z
     categoryId: z
       .string({ message: "La categoría es obligatoria" })
       .min(1, "La categoría es obligatoria"),
+
+    // nuevos campos
+    unit: z.string().optional(),
+    barcode: z.string().optional(),
+    minstock: z.coerce.number().min(0, "Stock mínimo no puede ser negativo").optional(),
+    supplierid: z.string().optional(),
 
     // nuevas imágenes
     images: z

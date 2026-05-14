@@ -1,19 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { LuEyeClosed, LuEye } from "react-icons/lu";
 //importamos de zod
 import { registerSchema, type RegisterFormData } from "@/schemes/register";
-import { Label } from "../ui/label";
 import FormInputPassword from "../common/Form/FormInputPassword";
 import { FormInput } from "../common/Form/FormInput";
 
 interface FormLoginProps {
-  //submitParent: (data: loginCredentials) => void;
+  submitParent: (data: RegisterFormData) => void;
   isPending: boolean;
 }
 
-const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
+const FormRegister = ({ submitParent, isPending }: FormLoginProps) => {
   //Form hook
   const {
     register,
@@ -24,7 +21,7 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
   });
 
   const onSubmit: SubmitHandler<RegisterFormData> = (data) => {
-    //submitParent(data);
+    submitParent(data);
   };
 
   return (
@@ -33,16 +30,17 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
         className="flex flex-col gap-2 font-body"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="space-y-5">
+        <div className="space-y-4">
           {/* name_organization */}
           <FormInput
             label="Nombre de la empresa"
             name="name_organization"
             register={register}
             errors={errors}
-            className="w-full px-4 py-5 text-sm text-white placeholder-gray-400 bg-gray-900 rounded-none border-t border-gray-700"
-            labelClassName="block text-sm font-body text-gray-300 sm:text-base"
             inputProps={{ placeholder: "Delux" }}
+            className="w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900"
+            labelClassName="block text-sm font-body text-gray-300
+            sm:text-base"
           />
 
           {/* nombre del suuario */}
@@ -51,9 +49,10 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
             name="full_name"
             register={register}
             errors={errors}
-            className="w-full px-4 py-5 text-sm text-white placeholder-gray-400 bg-gray-900 rounded-none border-t border-gray-700"
-            labelClassName="block text-sm font-body text-gray-300 sm:text-base"
             inputProps={{ placeholder: "Juan Perez Rivera" }}
+            labelClassName="block text-sm font-body text-gray-300
+            sm:text-base"
+            className="w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900"
           />
 
           {/* Phone */}
@@ -62,9 +61,10 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
             name="phone"
             register={register}
             errors={errors}
-            className="w-full px-4 py-5 text-sm text-white placeholder-gray-400 bg-gray-900 rounded-none border-t border-gray-700"
-            labelClassName="block text-sm font-body text-gray-300 sm:text-base"
-            inputProps={{ placeholder: "64553424    " }}
+            inputProps={{ placeholder: "64553424" }}
+            labelClassName="block text-sm font-body text-gray-300
+            sm:text-base"
+            className="w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900"
           />
 
           {/* Email */}
@@ -73,9 +73,10 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
             name="email"
             register={register}
             errors={errors}
-            className="w-full px-4 py-5 text-sm text-white placeholder-gray-400 bg-gray-900 rounded-none border-t border-gray-700"
-            labelClassName="block text-sm font-body text-gray-300 sm:text-base"
             inputProps={{ placeholder: "juan@gmail.com" }}
+            labelClassName="block text-sm font-body text-gray-300
+            sm:text-base"
+            className="w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900"
           />
 
           {/* Password */}
@@ -84,6 +85,7 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
             name="password"
             register={register}
             errors={errors}
+            className="w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900"
           />
 
           {/* confirm password */}
@@ -92,16 +94,17 @@ const FormRegister = ({ /* submitParent */ isPending }: FormLoginProps) => {
             name="confirmPassword"
             register={register}
             errors={errors}
+            className="w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900"
           />
 
-          {/* Botón de inicio de sesión */}
+          {/* Botón de registro */}
           <button
             type="submit"
-            className="w-full mt-5 py-3 text-base font-title font-medium text-black bg-white rounded-2xl hover:bg-gray-200 transition duration-200 shadow-lg 
+            className="w-full mt-5 py-2 text-base font-title font-medium text-black bg-white rounded-md hover:bg-gray-200 transition duration-200 shadow-lg 
             cursor-pointer"
             disabled={isPending}
           >
-            Iniciar Sesión
+            Registrarse
           </button>
         </div>
       </form>

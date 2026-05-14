@@ -1,11 +1,15 @@
 import { Label } from "@/components/ui/label";
-import { Input as ShadInput } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
 import type {
   FieldValues,
   Path,
   UseFormRegister,
   FieldErrors,
 } from "react-hook-form";
+
+import { get } from "react-hook-form";
+
 import type { ComponentProps } from "react";
 
 interface InputProps<T extends FieldValues> {
@@ -27,25 +31,30 @@ export function FormInput<T extends FieldValues>({
   className,
   labelClassName,
 }: InputProps<T>) {
+  const error = get(errors, name);
+
   return (
     <div className="grid gap-2 w-full">
       <Label htmlFor={name} className={labelClassName}>
         {label}
       </Label>
 
-      <ShadInput
+      <input
         id={name}
+        {...inputProps}
         {...register(name, {
           valueAsNumber: inputProps?.type === "number",
         })}
-        {...inputProps}
-        //className="[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-        className={`[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${className}`}
+        className={cn(
+          "w-full bg-transparent px-3 py-2 text-sm border border-border transition",
+          "focus:border-gray-500 focus:ring-1 focus:ring-gray-500",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+          className,
+        )}
       />
 
-      {errors?.[name] && (
-        <p className="text-sm text-red-500">{String(errors[name]?.message)}</p>
-      )}
+      {error && <p className="text-sm text-red-500">{String(error.message)}</p>}
     </div>
   );
 }

@@ -2,13 +2,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBranch } from "@/services/branchService";
 //importar lo types del branch
 import type { BranchInput, BranchOutput } from "@/types/branch";
+import { useCheckAuth } from "../auth/useCheckAuth";
 
 export const useCreateBranch = () => {
   const queryClient = useQueryClient();
 
+  const { data } = useCheckAuth();
+  const organizacionId = data?.organization?.id || "";
+
   return useMutation<BranchOutput, Error, BranchInput>({
     // La función 'mutationFn' que llama a tu API de Supabase
-    mutationFn: (branchData) => createBranch(branchData),
+    mutationFn: (branchData) => createBranch(branchData, organizacionId),
 
     // Opcional: Lógica después de que la mutación es exitosa
     onSuccess: () => {

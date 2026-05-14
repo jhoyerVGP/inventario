@@ -9,6 +9,7 @@ export const getEmployees = async (
   params: queryParams,
   //branchId: string | null,
   typeEmployee: "todos" | "con_acceso" | "sin_acceso",
+  employeeId: string,
 ) => {
   const { page, limit, search, sortField, sortOrder, branchId } = params;
   // Calculamos la paginación
@@ -22,7 +23,8 @@ export const getEmployees = async (
       {
         count: "exact",
       },
-    );
+    )
+    .neq("id", employeeId);
 
   // Búsqueda global
   if (search) {
@@ -62,27 +64,25 @@ export const getEmployees = async (
     throw new Error("Error al obtener empleados");
   }
   //refinar datos
-  const dataReifined = data.map(
-    (emp: any) => (
-      console.log("birthDate raw:", emp.birthDate, typeof emp.birthDate),
-      {
-        id: emp.id,
-        name: emp.name,
-        cedula: emp.cedula,
-        address: emp.address,
-        phone: emp.phone,
-        // Convertimos el string de la fecha a un objeto Date real
-        birthDate: emp.birthDate,
-        job: emp.job,
-        branchId: emp.branchId,
-        // Aplanamos los datos del usuario si existen
-        email: emp.users?.email || null,
-        systemRole: emp.users?.role || null,
-        idUser: emp.users?.id || null,
-      }
-    ),
+  const dataReifined = data.map((emp: any) =>
+    //console.log("birthDate raw:", emp.birthDate, typeof emp.birthDate),
+    ({
+      id: emp.id,
+      name: emp.name,
+      cedula: emp.cedula,
+      address: emp.address,
+      phone: emp.phone,
+      // Convertimos el string de la fecha a un objeto Date real
+      birthDate: emp.birthDate,
+      job: emp.job,
+      branchId: emp.branchId,
+      // Aplanamos los datos del usuario si existen
+      email: emp.users?.email || null,
+      systemRole: emp.users?.role || null,
+      idUser: emp.users?.id || null,
+    }),
   );
-  console.log("Data refined:", dataReifined);
+  //console.log("Data refined:", dataReifined);
   return {
     data: dataReifined || [],
     meta: {
@@ -173,7 +173,7 @@ export const updateEmployee = async (
   });
 
   if (error) {
-    console.error("Error al actualizar empleado:", error);
+    //console.error("Error al actualizar empleado:", error);
     throw new Error("Error al actualizar empleado");
   }
 

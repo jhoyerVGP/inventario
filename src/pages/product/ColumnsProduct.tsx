@@ -4,11 +4,10 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  Eye /* Calendar */,
+  Eye,
   PackagePlus,
   Plus,
   Repeat,
-  Tag,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { StockBadge } from "@/components/product/StockBadge";
 //context de la sucursal
 import { useBranch } from "../../context/BranchContext";
 import type { ProductModalState } from "@/hooks/product/hooksLogic/useProductModals";
@@ -43,7 +43,7 @@ export const columnsProduct = ({
             loading="lazy"
             src={row.original.main_image || undefined}
             alt={row.original.nameProd}
-            className="w-9.5 h-9.5 object-cover rounded block min-w-9.5 min-h-9.5"
+            className="w-9.5 h-9.5 object-contain rounded block min-w-9.5 min-h-9.5 bg-gray-50"
             style={{ backfaceVisibility: "hidden" }}
           />
           <span className="font-medium text-card-foreground">
@@ -91,8 +91,47 @@ export const columnsProduct = ({
   },
   {
     accessorKey: "total_stock",
-    header: "Stock Total",
+    header: "Stock",
     enableSorting: true,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <span className="font-medium">{row.original.total_stock || 0}</span>
+        <StockBadge
+          currentStock={row.original.total_stock || 0}
+          minimumStock={row.original.minstock || 0}
+          size="sm"
+          showIcon={true}
+        />
+      </div>
+    ),
+  },
+  {
+    accessorKey: "unit",
+    header: "Unidad",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.original.unit || "-"}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "supplier_name",
+    header: "Proveedor",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <span className="text-sm">{row.original.supplier_name || "-"}</span>
+    ),
+  },
+  {
+    accessorKey: "minstock",
+    header: "Stock Mín.",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.original.minstock || "0"}
+      </span>
+    ),
   },
   {
     id: "actions",

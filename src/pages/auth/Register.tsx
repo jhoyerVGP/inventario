@@ -1,32 +1,28 @@
-import FormLogin from "../../components/loginComp/FormLogin";
-//hook de login tanstack-react-query
-import { useLogin } from "../../hooks/auth/useLogin";
-import type { loginCredentials } from "@/schemes/auth";
+//hook de register tanstack-react-query
+import { useRegister } from "../../hooks/auth/useRegister";
+import type { RegisterFormData } from "@/schemes/register";
 import { VerifyCredencials } from "../../components/loginComp/VerifyCredencials";
 import { Link } from "react-router-dom";
 import FormRegister from "@/components/loginComp/FormRegister";
 
 const Register = () => {
-  const { mutate, isPending, isError } = useLogin();
+  const { mutate, isPending, isError } = useRegister();
 
-  const handleSubmit = (data: loginCredentials) => {
+  const handleSubmit = (data: RegisterFormData) => {
     mutate(data);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen h-dvh relative overflow-hidden">
+    <div className="flex items-center justify-center min-h-screen h-full w-full h-dvh relative overflow-y-auto bg-black">
       {/* fondo */}
-      <img
+      {/* <img
         src="/fondoLogin.jpg"
         alt="imagen de fondo"
         className="absolute h-full w-full inset-0 object-cover z-0"
-      />
-      <div className="absolute w-full h-full object-cover z-0 bg-black/20"></div>
+      /> */}
+      {/* <div className="absolute w-full h-full object-cover z-0 bg-black/20"></div> */}
       {/* Card principal */}
-      <div
-        className="relative w-full max-w-md p-8 space-y-7
-      sm:space-y-9"
-      >
+      <div className="relative w-full max-w-md p-8 sm:space-y-9">
         {/* título y descripción */}
         <div className="flex flex-col items-center gap-7 text-center text-white">
           <h1
@@ -45,11 +41,11 @@ const Register = () => {
         </div>
 
         {/* Formulario */}
-        <FormRegister isPending={isPending} />
+        <FormRegister isPending={isPending} submitParent={handleSubmit} />
 
-        <p className="text-center text-white text-sm">
+        <p className="text-center mt-4 text-white text-sm md:text-base">
           ¿Ya tienes una cuenta?{" "}
-          <Link to="/" className="text-blue-400 hover:underline">
+          <Link to="/" className="text-blue-300 hover:underline">
             Inicia sesión aquí
           </Link>
         </p>

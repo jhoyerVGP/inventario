@@ -92,7 +92,7 @@ const FormLogin = ({ submitParent, isPending }: FormLoginProps) => {
           {/* Botón de inicio de sesión */}
           <button
             type="submit"
-            className="w-full mt-5 py-3 text-base font-title font-medium text-black bg-white rounded-2xl hover:bg-gray-200 transition duration-200 shadow-lg 
+            className="w-full mt-5 py-2 text-base font-title font-medium text-black bg-white rounded-md hover:bg-gray-200 transition duration-200 shadow-lg 
             cursor-pointer"
             disabled={isPending}
           >

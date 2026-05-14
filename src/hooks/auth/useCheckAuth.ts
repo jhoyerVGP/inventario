@@ -25,8 +25,19 @@ export const useCheckAuth = () => {
 
       if (!employeeData) return null;
 
+      /* const user = {
+        id: userData.id,
+        name: employeeData.name,
+        email: userData.email,
+        role: userData.role,
+        branchId: employeeData.branchId,
+        avatar: userData.avatar,
+        phone: employeeData.phone,
+      }; */
+
       const user = {
         id: userData.id,
+        employeeId: employeeData.id,
         name: employeeData.name,
         email: userData.email,
         role: userData.role,

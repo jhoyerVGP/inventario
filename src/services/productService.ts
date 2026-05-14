@@ -4,6 +4,7 @@ import type { TableParams } from "@/components/common/tabla/api";
 import type { ProductInputService } from "@/schemes/product";
 import type { ProductSupT } from "@/types/product";
 import type { OfferFormValues } from "@/schemes/product";
+import { processProductImage } from "@/utils/processProductImage";
 
 //create product
 export const createProduct = async (dataProducto: ProductInputService) => {
@@ -17,6 +18,10 @@ export const createProduct = async (dataProducto: ProductInputService) => {
       description: dataProducto.description,
       brand: dataProducto.brand,
       categoryId: dataProducto.categoryId,
+      unit: dataProducto.unit,
+      barcode: dataProducto.barcode,
+      minstock: dataProducto.minstock || 0,
+      supplierid: dataProducto.supplierid,
     })
     .select()
     .single();
@@ -27,16 +32,17 @@ export const createProduct = async (dataProducto: ProductInputService) => {
 
   for (let i = 0; i < dataProducto.images.length; i++) {
     const file = dataProducto.images[i];
+    const processedFile = await processProductImage(file);
 
     // Subir archivo
     const upload = await supabase.storage
       .from("img-products")
-      .upload(`product-${data.id}/${file.name}`, file);
+      .upload(`product-${data.id}/${processedFile.name}`, processedFile);
 
     // Obtener URL pública
     const { data: url } = supabase.storage
       .from("img-products")
-      .getPublicUrl(`product-${data.id}/${file.name}`);
+      .getPublicUrl(`product-${data.id}/${processedFile.name}`);
 
     // Guardar URL en la base de datos
     const insert = await supabase.from("product_images").insert({
@@ -144,6 +150,10 @@ export const updateProduct = async (id: string, dataProducto: ProductSupT) => {
       description: dataProducto.description,
       brand: dataProducto.brand,
       categoryId: dataProducto.categoryId,
+      unit: dataProducto.unit,
+      barcode: dataProducto.barcode,
+      minstock: dataProducto.minstock,
+      supplierid: dataProducto.supplierid,
     })
     .eq("id", id)
     .select()
@@ -178,16 +188,17 @@ export const updateProduct = async (id: string, dataProducto: ProductSupT) => {
   if (dataProducto.images?.length) {
     for (let i = 0; i < dataProducto.images.length; i++) {
       const file = dataProducto.images[i];
+      const processedFile = await processProductImage(file);
 
       // Subir archivo
       const upload = await supabase.storage
         .from("img-products")
-        .upload(`product-${data.id}/${file.name}`, file);
+        .upload(`product-${data.id}/${processedFile.name}`, processedFile);
 
       // Obtener URL pública
       const { data: url } = supabase.storage
         .from("img-products")
-        .getPublicUrl(`product-${data.id}/${file.name}`);
+        .getPublicUrl(`product-${data.id}/${processedFile.name}`);
 
       // Guardar URL en la base de datos
       const insert = await supabase.from("product_images").insert({

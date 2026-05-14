@@ -66,7 +66,7 @@ export const userAuthData = async (authUserId: string) => {
     forcePasswordChange,
     employeeId,
     avatar
-  `
+  `,
     )
     .eq("auth_user_id", authUserId)
     .single();
@@ -76,7 +76,7 @@ export const userAuthData = async (authUserId: string) => {
   return data;
 };
 
-export const userEmployee = async (employeeId: string) => {
+/* export const userEmployee = async (employeeId: string) => {
   const { data, error } = await supabase
     .from("employees")
     .select("id,name,phone,branchId")
@@ -85,6 +85,23 @@ export const userEmployee = async (employeeId: string) => {
 
   if (error) throw error;
 
-  return data;
+  return data;} */
+
+// en authService.ts
+export const userEmployee = async (employeeId: string) => {
+  const { data, error } = await supabase
+    .from("employees")
+    .select("id, name, phone, branchId")
+    .eq("id", employeeId)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    name: data.name,
+    phone: data.phone,
+    branchId: data.branchId,
+  };
 };
 //--------------------------------------------------------------

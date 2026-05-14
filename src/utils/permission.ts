@@ -12,6 +12,8 @@ export const permissions: Permissions = {
     "VIEW_MOVEMENTS",
     "VIEW_POS",
     "VIEW_EMPLOYEES",
+    "VIEW_SUPPLIERS",
+    "VIEW_PURCHASES",
   ],
   ADMIN: [
     "VIEW_DASHBOARD",
@@ -21,7 +23,14 @@ export const permissions: Permissions = {
     "VIEW_MOVEMENTS",
     "VIEW_POS",
     "VIEW_EMPLOYEES",
+    "VIEW_SUPPLIERS",
+    "VIEW_PURCHASES",
   ],
   SELLER: ["VIEW_SALES", "VIEW_POS"],
-  INVENTORY: ["VIEW_DASHBOARD", "MANAGE_INVENTORY"],
+  INVENTORY: [
+    "VIEW_DASHBOARD",
+    "MANAGE_INVENTORY",
+    "VIEW_SUPPLIERS",
+    "VIEW_PURCHASES",
+  ],
 };

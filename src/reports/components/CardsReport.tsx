@@ -1,4 +1,4 @@
-import { BanknoteX, DollarSign, ShoppingCart, Wallet } from "lucide-react";
+import { BanknoteX, DollarSign, ShoppingCart, Wallet, AlertCircle, Box } from "lucide-react";
 import { MetricCard } from "./MetricCard";
 import type { CardsType } from "../types/daysType";
 
@@ -65,6 +65,28 @@ export const CardsReport = ({ data }: { data: CardsType }) => {
             isPositive={false}
             colorScheme="cardDebt"
             icon={BanknoteX}
+          />
+
+          {/* Stock bajo */}
+          <MetricCard
+            title="Productos con stock bajo"
+            value={formatNumber((data as any).low_stock_count || 0)}
+            subtitle="requieren reorden"
+            percentage=""
+            isPositive={false}
+            colorScheme="cardNormal"
+            icon={AlertCircle}
+          />
+
+          {/* Agotados */}
+          <MetricCard
+            title="Productos agotados"
+            value={formatNumber((data as any).out_of_stock_count || 0)}
+            subtitle="acción inmediata"
+            percentage=""
+            isPositive={false}
+            colorScheme="cardDebt"
+            icon={Box}
           />
         </div>
       </div>

@@ -58,18 +58,22 @@ export const getBranchesES = async () => {
     );
     throw new Error(error.message);
   }
-
+  //console.log("Datos obtenidos de getBranchesES:", data); // Debug: Verificar datos obtenidos
   return data;
 };
 
 //función para crear una nueva sucursal
-export const createBranch = async (branchData: BranchInput) => {
+export const createBranch = async (
+  branchData: BranchInput,
+  organizacionId: string,
+) => {
   const { data, error } = await supabase
     .from("branches")
     .insert({
       branchName: branchData.branch_name,
       address: branchData.address,
       code: branchData.code.toUpperCase(),
+      organization_id: organizacionId, // Asegúrate de pasar el ID de la organización aquí
     })
     .select()
     .single();

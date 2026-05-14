@@ -21,6 +21,9 @@ import Movements from "@/pages/movements/Movements";
 import Profile from "@/pages/profile/Profile";
 import Pos from "@/pages/pos/Pos";
 import Register from "@/pages/auth/Register";
+import Supplier from "@/pages/supplier/Supplier";
+import Purchase from "@/pages/purchase/Purchase";
+import CreatePurchase from "@/pages/purchase/CreatePurchase";
 
 const AppRouter = () => {
   return (
@@ -61,6 +64,12 @@ const AppRouter = () => {
           <Route path="movements" element={<Movements />} />
           {/* Perfil del usuario */}
           <Route path="profile" element={<Profile />} />
+          {/* Proveedores */}
+          <Route path="suppliers" element={<Supplier />} />
+          {/* Compras */}
+          <Route path="compras" element={<Purchase />} />
+          <Route path="compras/nueva" element={<CreatePurchase />} />
+          <Route path="compras/:id" element={<CreatePurchase />} />
         </Route>
       </Routes>
       <Toaster theme="dark" />

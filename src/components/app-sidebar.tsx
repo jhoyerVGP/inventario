@@ -10,6 +10,8 @@ import {
   Package,
   ShoppingCart,
   Store,
+  Truck,
+  Inbox,
 } from "lucide-react";
 
 //import { NavDropDown } from "@/components/nav-main";
@@ -105,6 +107,18 @@ const data = {
       url: "/dashboard/employees",
       icon: IdCardLanyard,
       permissions: "VIEW_EMPLOYEES",
+    },
+    {
+      name: "Proveedores",
+      url: "/dashboard/suppliers",
+      icon: Truck,
+      permissions: "VIEW_SUPPLIERS",
+    },
+    {
+      name: "Compras",
+      url: "/dashboard/compras",
+      icon: Inbox,
+      permissions: "VIEW_PURCHASES",
     },
   ],
 };

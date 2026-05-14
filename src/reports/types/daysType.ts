@@ -10,7 +10,12 @@ export interface DebtSummary {
   total_pending_debt: number;
 }
 
-export interface CardsType extends DailyCashSummary, DebtSummary {}
+export interface StockSummary {
+  low_stock_count?: number;
+  out_of_stock_count?: number;
+}
+
+export interface CardsType extends DailyCashSummary, DebtSummary, StockSummary {}
 
 //types para las graficas diarias (ejl: ultimos 7 dias)
 export interface SalesDataDayMonth {

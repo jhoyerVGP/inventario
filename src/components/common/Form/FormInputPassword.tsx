@@ -1,12 +1,16 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import React from "react";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
 import type {
+  FieldErrors,
   FieldValues,
   Path,
   UseFormRegister,
-  FieldErrors,
 } from "react-hook-form";
+
+import { get } from "react-hook-form";
+
 import { LuEye, LuEyeClosed } from "react-icons/lu";
 
 interface InputProps<T extends FieldValues> {
@@ -14,6 +18,9 @@ interface InputProps<T extends FieldValues> {
   name: Path<T>;
   register: UseFormRegister<T>;
   errors?: FieldErrors<T>;
+  placeholder?: string;
+  className?: string;
+  labelClassName?: string;
 }
 
 const FormInputPassword = <T extends FieldValues>({
@@ -21,28 +28,38 @@ const FormInputPassword = <T extends FieldValues>({
   name,
   register,
   errors,
+  placeholder = "••••••",
+  className,
+  labelClassName,
 }: InputProps<T>) => {
   const [showPassword, setShowPassword] = React.useState(false);
+
+  const error = get(errors, name);
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 w-full">
       <Label
-        className="block text-sm font-body text-gray-300
-            sm:text-base"
+        htmlFor={name}
+        className={cn(
+          "block text-sm font-body text-gray-300 sm:text-base",
+          labelClassName,
+        )}
       >
         {label}
       </Label>
+
       <div className="relative">
-        <Input
+        <input
+          id={name}
           type={showPassword ? "text" : "password"}
-          placeholder="••••••"
-          {...register(name, { required: true })}
-          className="w-full px-4 py-5 text-sm text-white placeholder-gray-400 bg-gray-900 rounded-none border-t border-gray-700"
+          placeholder={placeholder}
+          {...register(name)}
+          className={cn(
+            "w-full px-4 py-3 text-sm text-white placeholder-gray-400 bg-gray-900 outline-none",
+            className,
+          )}
         />
-        {errors?.[name] && (
-          <p className="text-sm text-red-500">
-            {String(errors[name]?.message)}
-          </p>
-        )}
+
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
@@ -51,6 +68,10 @@ const FormInputPassword = <T extends FieldValues>({
           {showPassword ? <LuEye size={18} /> : <LuEyeClosed size={18} />}
         </button>
       </div>
+
+      {error && (
+        <div className="text-red-400 text-sm mt-1">{String(error.message)}</div>
+      )}
     </div>
   );
 };

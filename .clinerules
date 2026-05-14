@@ -1,0 +1,209 @@
+# PROJECT OVERVIEW
+
+This project uses:
+- React
+- TypeScript
+- Next.js
+- Tailwind CSS
+- shadcn/ui
+- Supabase
+
+The codebase must remain:
+- scalable
+- maintainable
+- performant
+- secure
+- consistent
+- responsive
+- production-ready
+
+---
+
+# UI / UX RULES
+
+- Always build responsive interfaces for:
+  - mobile
+  - tablet
+  - desktop
+
+- Responsive design is mandatory with no exceptions.
+
+- UI must look visually balanced:
+  - consistent spacing
+  - coherent typography
+  - proportional component sizes
+  - proper visual hierarchy
+
+- Avoid oversized elements mixed with tiny elements.
+
+- Use modern premium UI design patterns.
+
+- Use shadcn/ui as the primary UI system whenever possible.
+
+- Reuse existing UI components before creating new ones.
+
+- Prefer clean and minimal interfaces focused on usability.
+
+- Maintain strong contrast and readability.
+
+- Avoid cluttered interfaces.
+
+- Animations should be subtle and performant.
+
+- Avoid unnecessary motion or heavy effects.
+
+---
+
+# STYLING RULES
+
+- Use Tailwind CSS utilities whenever possible.
+
+- Follow shadcn/ui styling conventions.
+
+- Prefer design consistency over visual experimentation.
+
+- Keep styles maintainable and reusable.
+
+- Avoid inline styles unless absolutely necessary.
+
+- Use semantic spacing and sizing.
+
+- Prefer reusable utility patterns.
+
+---
+
+# PERFORMANCE RULES
+
+Performance is a top priority.
+
+- Avoid unnecessary re-renders.
+- Avoid unnecessary useEffect usage.
+- Avoid unnecessary client-side rendering.
+- Minimize bundle size.
+- Prefer server-side logic when appropriate.
+- Optimize expensive operations.
+- Avoid duplicated requests.
+- Use lazy loading where appropriate.
+- Avoid unnecessary dependencies.
+- Keep components lightweight.
+- Optimize images and assets.
+- Preserve fast page load speed.
+
+All changes should consider:
+- runtime performance
+- scalability
+- user experience
+- perceived speed
+
+---
+
+# CODE QUALITY RULES
+
+- Use TypeScript strict patterns.
+- Avoid any types whenever possible.
+- Write self-explanatory code.
+- Keep code readable and maintainable.
+- Prefer simple solutions over overly clever code.
+- Use clear naming conventions.
+- Split large components into smaller reusable components.
+- Avoid deeply nested logic.
+- Avoid duplicated code.
+
+---
+
+# ARCHITECTURE RULES
+
+Use scalable and maintainable architecture patterns.
+
+Prefer:
+- feature-based architecture
+- separation of concerns
+- reusable modules
+- SOLID principles where applicable
+
+The system should remain easy to:
+- extend
+- debug
+- refactor
+- scale
+
+Avoid tightly coupled code.
+
+---
+
+# SECURITY RULES
+
+Security must always be considered.
+
+Always validate:
+- inputs
+- forms
+- API payloads
+- database operations
+
+Never trust client-side input.
+
+For numeric inputs:
+- allow only valid numeric values
+- enforce minimum values
+- enforce maximum values
+- prevent invalid characters
+- prevent inconsistent states
+
+Avoid:
+- unsafe mutations
+- insecure direct access
+- leaking sensitive data
+- exposing secrets
+- vulnerable logic
+
+---
+
+# DATA CONSISTENCY RULES
+
+Always preserve data consistency.
+
+- Prevent invalid states.
+- Handle edge cases carefully.
+- Ensure transactional safety where needed.
+- Prevent race conditions when possible.
+- Validate business rules before mutations.
+- Ensure UI reflects real data states.
+
+---
+
+# DEVELOPMENT RULES
+
+Before implementing changes:
+- analyze impact
+- analyze maintainability
+- analyze scalability
+- analyze performance implications
+
+Prefer improving existing implementations instead of rewriting unnecessarily.
+
+Avoid breaking existing functionality.
+
+Explain important architectural decisions before major refactors.
+
+---
+
+# ACCESSIBILITY RULES
+
+- Use accessible HTML whenever possible.
+- Maintain readable font sizes.
+- Ensure buttons and inputs are usable on mobile devices.
+- Maintain keyboard accessibility where appropriate.
+
+---
+
+# FINAL PRIORITIES
+
+Priority order:
+1. Security
+2. Data consistency
+3. Performance
+4. Maintainability
+5. Scalability
+6. Usability
+7. Visual quality
