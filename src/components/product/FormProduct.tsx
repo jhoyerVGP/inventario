@@ -43,7 +43,7 @@ const FormProduct = ({
     formState: { errors },
   } = useForm({
     resolver: zodResolver(
-      mode === "update" ? productFormSchemaUpdate : productFormSchema
+      mode === "update" ? productFormSchemaUpdate : productFormSchema,
     ),
     mode: "onChange",
     defaultValues: initialData || {
@@ -92,10 +92,11 @@ const FormProduct = ({
   ];
 
   // Opciones de proveedores
-  const supplierOptions = suppliers.map((s) => ({
-    value: s.id,
-    label: s.name,
-  })) || [];
+  const supplierOptions =
+    suppliers.map((s) => ({
+      value: s.id,
+      label: s.name,
+    })) || [];
 
   // Función helper para transformar los datos
   function transformProductData(data: ProductType) {
@@ -107,9 +108,10 @@ const FormProduct = ({
   //manejo del submit
   const onSubmit = (data: ProductType) => {
     const transformedData = transformProductData(data);
+    console.log("Datos transformados para el servicio:", transformedData);
     funParent(transformedData);
     //Forzamos el valor a undefined explícitamente
-    reset({
+    /*  reset({
       ...initialData, // o valores por defecto
       nameProd: "",
       brand: "",
@@ -121,7 +123,7 @@ const FormProduct = ({
       images: undefined,
       imageExisting: [],
       imageToDelete: [],
-    });
+    }); */
   };
 
   useEffect(() => {
@@ -187,17 +189,17 @@ const FormProduct = ({
         </div>
 
         {/* Nuevos campos: Unidad, Barcode, Stock Mínimo, Proveedor */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <FormSelect
-            label="Unidad de Medida"
-            name="unit"
-            control={control}
-            options={unitOptions}
-            placeholder="Seleccionar unidad"
-            errors={errors}
-            disabled={mode === "view"}
-          />
-          <FormInput
+
+        <FormSelect
+          label="Proveedor"
+          name="supplierid"
+          control={control}
+          options={supplierOptions}
+          placeholder="Seleccionar proveedor"
+          errors={errors}
+          disabled={mode === "view"}
+        />
+        {/* <FormInput
             label="Código de Barras"
             name="barcode"
             register={register}
@@ -207,8 +209,7 @@ const FormProduct = ({
               placeholder: "1234567890123",
               disabled: mode === "view",
             }}
-          />
-        </div>
+          /> */}
 
         <div className="grid md:grid-cols-2 gap-6">
           <FormInput
@@ -223,12 +224,13 @@ const FormProduct = ({
               disabled: mode === "view",
             }}
           />
+
           <FormSelect
-            label="Proveedor"
-            name="supplierid"
+            label="Unidad de Medida"
+            name="unit"
             control={control}
-            options={supplierOptions}
-            placeholder="Seleccionar proveedor"
+            options={unitOptions}
+            placeholder="Seleccionar unidad"
             errors={errors}
             disabled={mode === "view"}
           />

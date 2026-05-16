@@ -9,12 +9,12 @@ const Layout = () => {
       <AppSidebar />
 
       {/* SidebarInset con flex y altura completa */}
-      <SidebarInset className="flex flex-col overflow-hidden max-h-screen">
+      <SidebarInset className="flex flex-col overflow-hidden min-h-screen">
         {/* HEADER - Fijo */}
         <HeaderMain />
 
         {/* CONTENIDO - Sin overflow-auto, solo flex-1 */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           <Outlet />
         </div>
       </SidebarInset>

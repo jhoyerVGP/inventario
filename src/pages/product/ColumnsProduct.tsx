@@ -8,6 +8,7 @@ import {
   PackagePlus,
   Plus,
   Repeat,
+  Tag,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -20,59 +21,69 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { StockBadge } from "@/components/product/StockBadge";
-//context de la sucursal
-import { useBranch } from "../../context/BranchContext";
 import type { ProductModalState } from "@/hooks/product/hooksLogic/useProductModals";
 
 interface ColumnProps {
   openModal: (modal: ProductModalState) => void;
+  currentBranch: string | null; // ← viene de afuera
 }
 
 export const columnsProduct = ({
   openModal,
+  currentBranch,
 }: ColumnProps): ColumnDef<Product>[] => [
-  //mostrar nombre y la primera imgane del array de imagenes
   {
     accessorKey: "nameProd",
-    header: "Nombre Producto",
+    header: "Producto",
     enableSorting: true,
     cell: ({ row }) => {
+      const name = row.original.nameProd || "Sin producto";
       return (
-        <div className="flex items-center gap-3 relative z-0 min-w-40">
+        <div className="flex items-center gap-3 min-w-40">
           <img
             loading="lazy"
             src={row.original.main_image || undefined}
-            alt={row.original.nameProd}
-            className="w-9.5 h-9.5 object-contain rounded block min-w-9.5 min-h-9.5 bg-gray-50"
-            style={{ backfaceVisibility: "hidden" }}
+            alt={name}
+            className="w-9 h-9 object-contain rounded bg-gray-50 min-w-9 min-h-9"
           />
-          <span className="font-medium text-card-foreground">
-            {row.original.nameProd}
-          </span>
+          <span className="font-medium text-card-foreground">{name}</span>
         </div>
       );
     },
   },
   {
     accessorKey: "sku",
-    header: "Cod. unico",
+    header: "SKU",
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="text-card-foreground">{row.original.sku}</span>
+      <span className="text-sm text-muted-foreground">
+        {row.original.sku || "Sin SKU"}
+      </span>
     ),
   },
-  {
+  /* {
     accessorKey: "category_name",
     header: "Categoría",
     enableSorting: true,
-  },
-  {
+    cell: ({ row }) => (
+      <span className="text-sm">{row.original.category_name || "-"}</span>
+    ),
+  }, */
+/*   {
     accessorKey: "brand",
     header: "Marca",
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full">
-        {row.original.brand || "N/A"}
+      <span className="text-sm">{row.original.brand || "-"}</span>
+    ),
+  }, */
+  {
+    accessorKey: "supplier_name",
+    header: "Proveedor",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <span className="text-sm">
+        {row.original.supplier_name || "Sin proveedor"}
       </span>
     ),
   },
@@ -80,32 +91,23 @@ export const columnsProduct = ({
     accessorKey: "price",
     header: "Precio",
     enableSorting: true,
-    cell: ({ row }) => (
-      <span className="text-card-foreground">{row.original.price}</span>
-    ),
+    cell: ({ row }) => {
+      const price = row.original.price;
+      if (price === null || price === undefined) return "Sin precio";
+      return <span className="font-medium">Bs. {Number(price).toFixed(2)}</span>;
+    },
   },
-  {
+ /*  {
     accessorKey: "cost",
     header: "Costo",
     enableSorting: true,
-  },
-  {
-    accessorKey: "total_stock",
-    header: "Stock",
-    enableSorting: true,
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <span className="font-medium">{row.original.total_stock || 0}</span>
-        <StockBadge
-          currentStock={row.original.total_stock || 0}
-          minimumStock={row.original.minstock || 0}
-          size="sm"
-          showIcon={true}
-        />
-      </div>
+      <span className="text-sm text-muted-foreground">
+        Bs. {row.original.cost ? Number(row.original.cost).toFixed(2) : "-"}
+      </span>
     ),
-  },
-  {
+  }, */
+  /* {
     accessorKey: "unit",
     header: "Unidad",
     enableSorting: true,
@@ -114,32 +116,48 @@ export const columnsProduct = ({
         {row.original.unit || "-"}
       </span>
     ),
-  },
-  {
-    accessorKey: "supplier_name",
-    header: "Proveedor",
+  }, */
+ /*  {
+    accessorKey: "barcode",
+    header: "Cód. Barras",
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="text-sm">{row.original.supplier_name || "-"}</span>
+      <span className="text-sm text-muted-foreground">
+        {row.original.barcode || "-"}
+      </span>
+    ),
+  }, */
+  {
+    accessorKey: "total_stock",
+    header: "Stock",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <span className="font-medium">{row.original.total_stock ?? 0}</span>
+        <StockBadge
+          currentStock={row.original.total_stock ?? 0}
+          minimumStock={row.original.minstock ?? 0}
+          size="sm"
+          showIcon={true}
+        />
+      </div>
     ),
   },
-  {
+ /*  {
     accessorKey: "minstock",
     header: "Stock Mín.",
     enableSorting: true,
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
-        {row.original.minstock || "0"}
+        {row.original.minstock ?? 0}
       </span>
     ),
-  },
+  }, */
   {
     id: "actions",
     header: "Acciones",
     cell: ({ row }) => {
       const product = row.original;
-      //sucursal actual
-      const { currentBranch } = useBranch();
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -155,16 +173,17 @@ export const columnsProduct = ({
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link to={`/dashboard/viewp/${product.id}`}>
                 <Eye className="mr-2 h-4 w-4" />
-                <span>Ver Detalles</span>
+                Ver Detalles
               </Link>
             </DropdownMenuItem>
-            {/* ESTO SOLO SE MUESTRA EN VISTA GLOBAL */}
+
+            {/* Vista global */}
             {!currentBranch && (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to={`/dashboard/editp/${product.id}`}>
                     <Pencil className="mr-2 h-4 w-4" />
-                    <span>Editar</span>
+                    Editar
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -178,36 +197,34 @@ export const columnsProduct = ({
                   }
                 >
                   <Tag className="mr-2 h-4 w-4" />
-                  <span>Gestionar oferta</span>
+                  Gestionar oferta
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  //onClick={() => setOpenPAB(product.id)}
+                  className="cursor-pointer"
                   onClick={() =>
                     openModal({ type: "addBranch", productId: product.id })
                   }
-                  className="cursor-pointer"
                 >
                   <PackagePlus className="mr-2 h-4 w-4" />
-                  <span>Agregar a sucursal/es</span>
+                  Agregar a sucursal/es
                 </DropdownMenuItem>
               </>
             )}
-            {/* ESTO SE CON LA VISTA ESPECIFICA DE SUCURSAL */}
+
+            {/* Vista por sucursal */}
             {!!currentBranch && (
               <>
                 <DropdownMenuItem
-                  //onClick={() => setOpenAdd(product.id)}
+                  className="cursor-pointer"
                   onClick={() =>
                     openModal({ type: "addBranchStock", productId: product.id })
                   }
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  <span>Aumentar Strock</span>
+                  Aumentar Stock
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  /* onClick={() =>
-                    setOpenRemove(product.id, product.total_stock as number)
-                  } */
+                  className="cursor-pointer"
                   onClick={() =>
                     openModal({
                       type: "remove",
@@ -217,11 +234,11 @@ export const columnsProduct = ({
                   }
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  <span>Quitar Strock</span>
+                  Quitar Stock
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  className="cursor-pointer"
                   onClick={() =>
-                    //setOpenTransfer(product.id, product.total_stock as number)
                     openModal({
                       type: "transfer",
                       productId: product.id,
@@ -230,22 +247,20 @@ export const columnsProduct = ({
                   }
                 >
                   <Repeat className="mr-2 h-4 w-4" />
-                  <span>Transferir Strock</span>
+                  Transferir Stock
                 </DropdownMenuItem>
               </>
             )}
 
             <DropdownMenuSeparator />
-
             <DropdownMenuItem
-              //onClick={() => setOpenDelete(product.id)}
+              className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
               onClick={() =>
                 openModal({ type: "delete", productId: product.id })
               }
-              className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              <span>Eliminar</span>
+              Eliminar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

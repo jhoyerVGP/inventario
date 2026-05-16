@@ -1,10 +1,8 @@
-import { type ColumnDef } from "@tanstack/react-table";
-import { type Purchase } from "@/types/purchase";
-import {
-  MoreHorizontal,
-  Eye,
-  X,
-} from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { PurchaseRow } from "@/types/purchase";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eye, MoreHorizontal, Pencil, Trash2, CheckCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,106 +11,119 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
-interface ColumnProps {
-  onView?: (id: string) => void;
-  onCancel?: (id: string) => void;
+const statusMap = {
+  DRAFT: { label: "Borrador", className: "bg-slate-100 text-slate-700" },
+  CONFIRMED: { label: "Confirmada", className: "bg-green-100 text-green-700" },
+};
+
+interface Props {
+  onView: (id: string) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onConfirm: (id: string) => void;
 }
 
 export const columnsPurchase = ({
   onView,
-  onCancel,
-}: ColumnProps): ColumnDef<Purchase>[] => [
+  onEdit,
+  onDelete,
+  onConfirm,
+}: Props): ColumnDef<PurchaseRow>[] => [
   {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => (
-      <span className="font-mono text-xs text-muted-foreground">
-        {row.original.id.slice(0, 8)}...
-      </span>
-    ),
+    accessorKey: "created_at",
+    header: "Fecha",
+    cell: ({ row }) => {
+      const createdAt = row.original.created_at;
+      if (!createdAt) return "Sin fecha";
+      return format(new Date(createdAt), "dd MMM yyyy", { locale: es });
+    },
   },
   {
-    accessorKey: "supplier_name",
     header: "Proveedor",
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.supplier_name}</span>
-    ),
+    cell: ({ row }) => row.original.suppliers?.name ?? "—",
   },
   {
-    accessorKey: "branch_name",
     header: "Sucursal",
-    cell: ({ row }) => <span>{row.original.branch_name}</span>,
+    cell: ({ row }) => row.original.branches?.branchName ?? "—",
+  },
+  {
+    header: "Registrado por",
+    cell: ({ row }) => row.original.users?.employees?.name ?? "—",
   },
   {
     accessorKey: "total",
     header: "Total",
-    cell: ({ row }) => (
-      <span className="font-medium text-brand">
-        {parseFloat(row.original.total as any).toFixed(2)} Bs.
-      </span>
-    ),
+    cell: ({ row }) => {
+      const total = row.original.total;
+      if (total === null || total === undefined) return "Sin total";
+      return `Bs. ${Number(total).toFixed(2)}`;
+    },
   },
   {
     accessorKey: "status",
     header: "Estado",
     cell: ({ row }) => {
-      const status = row.original.status;
-      const statusMap: Record<string, { badge: string; color: string }> = {
-        PENDING: { badge: "Pendiente", color: "bg-yellow-100 text-yellow-800" },
-        RECEIVED: { badge: "Recibido", color: "bg-green-100 text-green-800" },
-        CANCELLED: { badge: "Cancelado", color: "bg-red-100 text-red-800" },
-      };
-
-      const { badge, color } = statusMap[status] || { badge: "Desconocido", color: "" };
-
-      return <Badge className={color}>{badge}</Badge>;
+      const statusKey = row.original.status;
+      const s = statusKey ? statusMap[statusKey] : undefined;
+      if (!s) return <span>Sin estado</span>;
+      return (
+        <Badge className={`${s.className} border-0 font-medium`}>
+          {s.label}
+        </Badge>
+      );
     },
   },
   {
-    accessorKey: "created_at",
-    header: "Fecha",
-    cell: ({ row }) => (
-      <span className="text-sm">
-        {format(new Date(row.original.created_at), "dd/MM/yyyy HH:mm")}
-      </span>
-    ),
-  },
-  {
     id: "actions",
-    header: "Acciones",
+    header: "",
     cell: ({ row }) => {
-      const canCancel = row.original.status === "RECEIVED";
-
+      const isConfirmed = row.original.status === "CONFIRMED";
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100">
+              <span className="sr-only">Abrir menú</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
-
-            {onView && (
-              <DropdownMenuItem onClick={() => onView(row.original.id)}>
-                <Eye className="mr-2 h-4 w-4" />
-                Ver Detalle
-              </DropdownMenuItem>
-            )}
-
-            {onCancel && canCancel && (
-              <DropdownMenuItem
-                onClick={() => onCancel(row.original.id)}
-                className="text-destructive"
-              >
-                <X className="mr-2 h-4 w-4" />
-                Cancelar Compra
-              </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onView(row.original.id)}
+              className="cursor-pointer"
+            >
+              <Eye className="mr-2 h-4 w-4" />
+              Ver detalles
+            </DropdownMenuItem>
+            {!isConfirmed && (
+              <>
+                <DropdownMenuItem
+                  onClick={() => onEdit(row.original.id)}
+                  className="cursor-pointer"
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onConfirm(row.original.id)}
+                  className="cursor-pointer"
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Confirmar
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onDelete(row.original.id)}
+                  className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Eliminar
+                </DropdownMenuItem>
+              </>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

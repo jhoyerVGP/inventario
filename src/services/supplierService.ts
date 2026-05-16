@@ -2,6 +2,15 @@ import { supabase } from "@/api/supabaseClient";
 import type { Supplier, SupplierType } from "@/types/supplier";
 import type { TableParams } from "@/components/common/tabla/api";
 
+export const getSuppliersAll = async () => {
+  const { data, error } = await supabase
+    .from("suppliers")
+    .select("*")
+    .is("deleted_at", null);
+  if (error) throw new Error(error.message);
+  return data as Supplier[];
+};
+
 // Get all active suppliers
 export const getSuppliers = async (params: TableParams) => {
   const from = (params.pageIndex - 1) * params.pageSize;
@@ -16,7 +25,7 @@ export const getSuppliers = async (params: TableParams) => {
   // Aplicar filtro de búsqueda si existe
   if (params.globalFilter) {
     query = query.or(
-      `name.ilike.%${params.globalFilter}%,email.ilike.%${params.globalFilter}%,phone.ilike.%${params.globalFilter}%`
+      `name.ilike.%${params.globalFilter}%,email.ilike.%${params.globalFilter}%,phone.ilike.%${params.globalFilter}%`,
     );
   }
 

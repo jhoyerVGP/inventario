@@ -37,9 +37,10 @@ export const columnsPersonal = ({
     header: "Nombre Completo",
     enableSorting: true,
     cell: ({ row }) => {
+      const name = row.original.name || "Sin nombre";
       return (
         <div className="flex items-center gap-3">
-          <span className="text-card-foreground">{row.original.name}</span>
+          <span className="text-card-foreground">{name}</span>
         </div>
       );
     },
@@ -49,7 +50,9 @@ export const columnsPersonal = ({
     header: "Cédula",
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="text-card-foreground">{row.original.cedula}</span>
+      <span className="text-card-foreground">
+        {row.original.cedula || "Sin cédula"}
+      </span>
     ),
   },
   {
@@ -58,7 +61,7 @@ export const columnsPersonal = ({
     enableSorting: true,
     cell: ({ row }) => (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-        {row.original.job}
+        {row.original.job || "Sin cargo"}
       </span>
     ),
   },
@@ -67,7 +70,9 @@ export const columnsPersonal = ({
     header: "Teléfono",
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="text-card-foreground">{row.original.phone}</span>
+      <span className="text-card-foreground">
+        {row.original.phone || "Sin teléfono"}
+      </span>
     ),
   },
   {
@@ -75,6 +80,7 @@ export const columnsPersonal = ({
     header: "Edad",
     enableSorting: true,
     cell: ({ row }) => {
+      if (!row.original.birthDate) return "Sin edad";
       const hoy = new Date();
       const nacimiento = new Date(row.original.birthDate + "T00:00:00");
 

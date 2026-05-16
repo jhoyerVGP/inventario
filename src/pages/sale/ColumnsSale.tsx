@@ -24,47 +24,61 @@ export const columnsSaleH = ({ openM }: Props): ColumnDef<SaleH>[] => [
     accessorKey: "clientName",
     header: "Cliente",
     enableSorting: true,
-    cell: ({ row }) => <span>{row.original.clientName}</span>,
+    cell: ({ row }) => (
+      <span>{row.original.clientName || "Sin cliente"}</span>
+    ),
   },
   {
     accessorKey: "employee_name",
     header: "Vendedor",
     enableSorting: true,
-    cell: ({ row }) => <span>{row.original.employee_name}</span>,
+    cell: ({ row }) => (
+      <span>{row.original.employee_name || "Sin vendedor"}</span>
+    ),
   },
   {
     accessorKey: "finalAmount",
     header: "Monto Cobrado",
     enableSorting: true,
-    cell: ({ row }) => <span>{row.original.finalAmount}</span>,
+    cell: ({ row }) => {
+      const amount = row.original.finalAmount;
+      return <span>{amount ?? "Sin monto"}</span>;
+    },
   },
   {
     accessorKey: "debtAmount",
     header: "Deuda",
     enableSorting: true,
+    cell: ({ row }) => <span>{row.original.debtAmount ?? "Sin deuda"}</span>,
   },
   {
     accessorKey: "status",
     header: "Estado",
     enableSorting: true,
-    cell: ({ row }) => getStatusBadge(row.original.status),
+    cell: ({ row }) =>
+      row.original.status
+        ? getStatusBadge(row.original.status)
+        : "Sin estado",
   },
   {
     accessorKey: "created_at",
     header: "Fecha de Venta",
     enableSorting: true,
     //aqui deberiamos convertir la fecha a un formato mas legible
-    cell: ({ row }) => (
-      <span>
-        {new Date(row.original.created_at).toLocaleDateString("es-BO", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const createdAt = row.original.created_at;
+      if (!createdAt) return <span>Sin fecha</span>;
+
+      const formatted = new Date(createdAt).toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      return <span>{formatted}</span>;
+    },
   },
   {
     id: "actions",

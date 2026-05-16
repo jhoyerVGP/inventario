@@ -68,7 +68,7 @@ const AppRouter = () => {
           <Route path="suppliers" element={<Supplier />} />
           {/* Compras */}
           <Route path="compras" element={<Purchase />} />
-          <Route path="compras/nueva" element={<CreatePurchase />} />
+          <Route path="compras/create-purchase" element={<CreatePurchase />} />
           <Route path="compras/:id" element={<CreatePurchase />} />
         </Route>
       </Routes>

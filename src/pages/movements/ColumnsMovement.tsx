@@ -26,22 +26,28 @@ export const columnsMovement = ({
     accessorKey: "type",
     header: "Tipo",
     enableSorting: true,
-    cell: ({ row }) => translateMovementType(row.original.type),
+    cell: ({ row }) =>
+      row.original.type
+        ? translateMovementType(row.original.type)
+        : "Sin tipo",
   },
   {
     accessorKey: "employee_name",
     header: "Empleado",
     enableSorting: true,
+    cell: ({ row }) => row.original.employee_name || "Sin empleado",
   },
   {
     accessorKey: "name_prod",
     header: "Producto",
     enableSorting: true,
+    cell: ({ row }) => row.original.name_prod || "Sin producto",
   },
   {
     accessorKey: "movedQuantity",
     header: "Cantidad Movida",
     enableSorting: true,
+    cell: ({ row }) => row.original.movedQuantity ?? 0,
   },
   {
     accessorKey: "branch_from_name",
@@ -49,7 +55,9 @@ export const columnsMovement = ({
     enableSorting: true,
     cell: ({ row }) => {
       const { type, branch_from_name, branch_to_name } = row.original;
-      return getBranchName(type, branch_from_name, branch_to_name);
+      return (
+        getBranchName(type, branch_from_name, branch_to_name) || "Sin sucursal"
+      );
     },
   },
   {

@@ -73,6 +73,12 @@ const data = {
       permissions: "VIEW_BRANCHES",
     },
     {
+      name: "Proveedores",
+      url: "/dashboard/suppliers",
+      icon: Truck,
+      permissions: "VIEW_SUPPLIERS",
+    },
+    {
       name: "Productos",
       url: "/dashboard/products",
       icon: Package,
@@ -84,23 +90,12 @@ const data = {
       icon: List,
       permissions: "VIEW_CATEGORIES",
     },
-    {
-      name: "Ventas",
-      url: "/dashboard/sales",
-      icon: History,
-      permissions: "VIEW_SALES",
-    },
+
     {
       name: "Movimientos",
       url: "/dashboard/movements",
       icon: AudioWaveform,
       permissions: "VIEW_MOVEMENTS",
-    },
-    {
-      name: "Punto de Venta",
-      url: "/dashboard/pos",
-      icon: ShoppingCart,
-      permissions: "VIEW_POS",
     },
     {
       name: "Empleados",
@@ -109,16 +104,22 @@ const data = {
       permissions: "VIEW_EMPLOYEES",
     },
     {
-      name: "Proveedores",
-      url: "/dashboard/suppliers",
-      icon: Truck,
-      permissions: "VIEW_SUPPLIERS",
-    },
-    {
       name: "Compras",
       url: "/dashboard/compras",
       icon: Inbox,
       permissions: "VIEW_PURCHASES",
+    },
+    {
+      name: "Ventas",
+      url: "/dashboard/sales",
+      icon: History,
+      permissions: "VIEW_SALES",
+    },
+    {
+      name: "Punto de Venta",
+      url: "/dashboard/pos",
+      icon: ShoppingCart,
+      permissions: "VIEW_POS",
     },
   ],
 };

@@ -3,7 +3,7 @@ import FormProduct from "@/components/product/FormProduct";
 import { useGetCategory } from "@/hooks/category/useGetcategory";
 //hook de creacion
 import { useCreateProduct } from "@/hooks/product/useCreateProduct";
-import { useGetSuppliers } from "@/hooks/useSupplier";
+import { useGetSuppliersAll } from "@/hooks/useSupplier";
 import { toast } from "sonner";
 //type product para el input service
 import type { ProductInputService } from "@/schemes/product";
@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { useUpdateProduct } from "@/hooks/product/useUpdateProduct";
 import { useNavigate } from "react-router-dom";
 import { SkeletonCreateProduct } from "@/components/product/SkeletonCreateProduct";
-import type { TableParams } from "@/components/common/tabla/api";
 
 interface Props {
   mode?: "create" | "update" | "view";
@@ -29,12 +28,8 @@ const CreateProduct = (mode: Props) => {
   const navigate = useNavigate();
   //obtenemos las categorias
   const { data: categories } = useGetCategory();
-  //obtenemos los proveedores
-  const suppliersParams: TableParams = {
-    pageIndex: 1,
-    pageSize: 1000,
-  };
-  const { data: suppliersData } = useGetSuppliers(suppliersParams);
+
+  const { data: suppliersData } = useGetSuppliersAll();
   //hook creacion y actualización
   const create = useCreateProduct();
   const update = useUpdateProduct();
@@ -73,6 +68,10 @@ const CreateProduct = (mode: Props) => {
         cost: productData.cost,
         description: productData.description,
         brand: productData.brand,
+        unit: productData.unit,
+        barcode: productData.barcode,
+        minstock: productData.minstock,
+        supplierid: productData.supplierid,
         images: productData.images,
         sku: productData.sku,
       };
@@ -115,7 +114,7 @@ const CreateProduct = (mode: Props) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 w-full h-full overflow-y-auto">
+    <div className="max-w-7xl mx-auto p-4 w-full h-full">
       <div className="flex flex-col gap-2 w-full justify-between mb-6 lg:flex-row">
         <div className="flex flex-col gap-2 md:flex-row-reverse md:justify-between w-full">
           {mode?.mode === "view" && (
@@ -175,7 +174,7 @@ const CreateProduct = (mode: Props) => {
       {/* Formulario del producto */}
       <FormProduct
         categories={categories || []}
-        suppliers={suppliersData?.data || []}
+        suppliers={suppliersData || []}
         funParent={handleSubmit}
         mode={mode?.mode === "view" ? "view" : isEditing ? "update" : "create"}
         initialData={id ? dataPrepared : undefined}

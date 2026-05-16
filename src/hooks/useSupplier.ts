@@ -7,9 +7,17 @@ import {
   updateSupplier,
   deleteSupplier,
   toggleSupplierStatus,
+  getSuppliersAll,
 } from "@/services/supplierService";
 import type { SupplierType } from "@/types/supplier";
 import type { TableParams } from "@/components/common/tabla/api";
+
+export const useGetSuppliersAll = () => {
+  return useQuery({
+    queryKey: ["suppliers-all"],
+    queryFn: () => getSuppliersAll(),
+  });
+};
 
 export const useGetSuppliers = (params: TableParams) => {
   return useQuery({
@@ -36,6 +44,7 @@ export const useCreateSupplier = () => {
         position: "top-right",
       });
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      queryClient.invalidateQueries({ queryKey: ["suppliers-all"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Error al crear proveedor");
@@ -54,6 +63,7 @@ export const useUpdateSupplier = () => {
         position: "top-right",
       });
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      queryClient.invalidateQueries({ queryKey: ["suppliers-all"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Error al actualizar proveedor");
@@ -71,6 +81,7 @@ export const useDeleteSupplier = () => {
         position: "top-right",
       });
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      queryClient.invalidateQueries({ queryKey: ["suppliers-all"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Error al eliminar proveedor", {
@@ -91,6 +102,7 @@ export const useToggleSupplierStatus = () => {
         position: "top-right",
       });
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      queryClient.invalidateQueries({ queryKey: ["suppliers-all"] });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Error al cambiar estado", {

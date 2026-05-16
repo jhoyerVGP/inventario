@@ -57,7 +57,10 @@ export default function Product() {
   const { user } = useAuth();
 
   //obtenemos los productos segun el estado de la tabla y la sucursal actual
-  const { data, isLoading, isError } = useGetprodut(tableState.apiParams, currentBranch);
+  const { data, isLoading, isError } = useGetprodut(
+    tableState.apiParams,
+    currentBranch,
+  );
 
   //usamos el hook de modales y sus funciones para abrir y cerrar
   const { modal, openModal, closeModal } = useProductModals();
@@ -210,7 +213,7 @@ export default function Product() {
         />
         <div className="flex-1 min-h-0">
           <DataTable
-            columns={columnsProduct({ openModal })}
+            columns={columnsProduct({ openModal, currentBranch })}
             data={data?.data || []}
             rowCount={data?.meta.total ?? 0}
             pagination={tableState.pagination}

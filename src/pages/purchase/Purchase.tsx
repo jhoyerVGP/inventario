@@ -1,12 +1,20 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/common/tabla/DataTable";
 import { DebouncedInput } from "@/components/common/tabla/DebouncedInput";
 import { useServerTableState } from "@/components/common/tabla/useServerTableState";
 import { columnsPurchase } from "./ColumnsPurchase";
-import { useGetPurchases, useCancelPurchase } from "@/hooks/usePurchase";
-import { useBranch } from "@/context/BranchContext";
+import { useGetPurchases } from "@/hooks/purchase/usePurchase";
+import { PurchaseModals } from "@/components/purchase/PurchaseModals";
+import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import type { PurchaseRow } from "@/types/purchase";
+import {
+  useDeletePurchase,
+  useConfirmPurchase,
+} from "@/hooks/purchase/usePurchase";
+import { AlertDelete } from "@/components/common/AlertDelet";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,111 +24,130 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus } from "lucide-react";
 
-const Purchase = () => {
-  const navigate = useNavigate();
-  const { currentBranch } = useBranch();
-  const { mutate: cancelPurchase } = useCancelPurchase();
-
+export default function Purchases() {
   const tableState = useServerTableState({});
-  useEffect(() => {
-    tableState.setPagination({
-      pageIndex: 0,
-      pageSize: tableState.pagination.pageSize,
+  const { data, isLoading, isError } = useGetPurchases(tableState.apiParams);
+  const navigate = useNavigate();
+  const { mutateAsync: deletePurchase } = useDeletePurchase();
+  const { mutateAsync: confirmPurchase } = useConfirmPurchase();
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteId) return;
+    const promise = deletePurchase(deleteId);
+    toast.promise(promise, {
+      loading: "Eliminando compra...",
+      success: "Compra eliminada correctamente",
+      error: (err) => err.message || "Error al eliminar la compra",
+      position: "top-right",
+      duration: 4000,
     });
-  }, [currentBranch]);
-
-  const { data: purchasesData, isLoading, isError } = useGetPurchases(
-    {
-      pageIndex: tableState.pagination.pageIndex + 1,
-      pageSize: tableState.pagination.pageSize,
-      globalFilter: tableState.globalFilter,
-      sorting: tableState.sorting,
-    },
-    currentBranch!
-  );
-
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedPurchaseId, setSelectedPurchaseId] = useState<string | null>(
-    null
-  );
-
-  const handleCancelPurchase = (id: string) => {
-    setSelectedPurchaseId(id);
-    setCancelDialogOpen(true);
+    setDeleteOpen(false);
+    setDeleteId(null);
   };
 
-  const confirmCancel = () => {
-    if (selectedPurchaseId) {
-      cancelPurchase(selectedPurchaseId);
-      setCancelDialogOpen(false);
-      setSelectedPurchaseId(null);
-    }
+  const handleConfirm = (id: string) => {
+    setConfirmId(id);
+    setConfirmOpen(true);
   };
 
-  const columns = columnsPurchase({
-    onView: (id) => navigate(`/compras/${id}`),
-    onCancel: handleCancelPurchase,
-  });
+  const confirmPurchaseFlow = () => {
+    if (!confirmId) return;
+    const promise = confirmPurchase(confirmId);
+    toast.promise(promise, {
+      loading: "Confirmando compra...",
+      success: "Compra confirmada correctamente",
+      error: (err) => err.message || "Error al confirmar la compra",
+      position: "top-right",
+      duration: 4000,
+    });
+    setConfirmOpen(false);
+    setConfirmId(null);
+  };
 
   return (
-    <div className="bg-background-view h-full w-full">
+    <div className="bg-background-view h-full">
       <div className="h-[calc(100vh-54px)] flex flex-col max-w-7xl mx-auto py-2 gap-2 px-4">
-        <div className="flex flex-col gap-3 justify-between md:items-center md:flex-row relative">
-          <h1 className="text-2xl font-semibold">Compras</h1>
-          <div className="flex items-center gap-6">
-            <Button
-              onClick={() => navigate("/compras/nueva")}
-              className="btn-create w-full gap-2"
-            >
+        <div className="flex flex-col gap-3 justify-between md:items-center shrink-0 md:flex-row">
+          <h1 className="tracking-wide font-title text-xl text-foreground lg:text-2xl">
+            Compras
+          </h1>
+          <Button asChild className="btn-create w-full md:w-auto">
+            <Link to="create-purchase">
               <Plus size={18} />
-              Nueva Compra
-            </Button>
-          </div>
+              <span>Nueva Compra</span>
+            </Link>
+          </Button>
         </div>
 
         <DebouncedInput
           valueDafault={tableState.globalFilter ?? ""}
           onChange={tableState.onGlobalFilterChange}
-          placeholder="Buscar compras..."
+          placeholder="Buscar por proveedor..."
         />
 
-        <div className="flex-1 min-h-0 w-full">
-          <DataTable
-            columns={columns}
-            data={purchasesData?.data || []}
-            rowCount={purchasesData?.rowCount || 0}
-            pagination={tableState.pagination}
-            setPagination={tableState.setPagination}
-            sorting={tableState.sorting}
-            setSorting={tableState.setSorting}
-            isLoading={isLoading}
-            isError={isError}
-          />
-        </div>
-      </div>
+        <DataTable
+          columns={columnsPurchase({
+            onView: setSelectedId,
+            onEdit: (id) => navigate(`/dashboard/compras/${id}`),
+            onDelete: handleDelete,
+            onConfirm: handleConfirm,
+          })}
+          data={(data?.data as PurchaseRow[]) || []}
+          rowCount={data?.meta.total ?? 0}
+          pagination={tableState.pagination}
+          setPagination={tableState.setPagination}
+          sorting={tableState.sorting}
+          setSorting={tableState.setSorting}
+          isLoading={isLoading}
+          isError={isError}
+        />
 
-      {/* Cancel Dialog */}
-      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Cancelar Compra</AlertDialogTitle>
-            <AlertDialogDescription>
-              ¿Estás seguro de que deseas cancelar esta compra? El stock será
-              revertido automáticamente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex gap-2">
-            <AlertDialogCancel>No, mantener</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancel} className="bg-destructive hover:bg-destructive/90">
-              Sí, cancelar compra
-            </AlertDialogAction>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
+        <PurchaseModals
+          purchaseId={selectedId}
+          onClose={() => setSelectedId(null)}
+        />
+
+        <AlertDelete
+          title="Eliminar Compra"
+          description="¿Estás seguro de que deseas eliminar esta compra? Esta acción no se puede deshacer."
+          isOpen={deleteOpen}
+          setOpenAlert={() => setDeleteOpen(!deleteOpen)}
+          funDelete={confirmDelete}
+        />
+
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Compra</AlertDialogTitle>
+              <AlertDialogDescription>
+                Al confirmar, la compra queda bloqueada y se actualiza el
+                inventario. Esta accion no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex gap-2">
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmPurchaseFlow}
+                className="btn-create"
+              >
+                Confirmar
+              </AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
-};
-
-export default Purchase;
+}

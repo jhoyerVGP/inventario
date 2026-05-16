@@ -32,13 +32,14 @@ export const columnsCategory = ({
     accessorKey: "nameCat",
     header: "Nombre Categoría",
     enableSorting: true,
+    cell: ({ row }) => row.original.nameCat || "Sin categoria",
   },
   {
     accessorKey: "description",
     header: "Descripción Categoría",
     enableSorting: false,
     cell: ({ row }) => {
-      const description = row.original.description;
+      const description = row.original.description || "Sin descripcion";
       return (
         <div
           className="w-full max-w-full line-clamp-2 break-words"
@@ -55,7 +56,7 @@ export const columnsCategory = ({
     enableSorting: true,
     cell: ({ row }) => (
       <div className="text-center w-full max-w-30 truncate">
-        {row.original.total_products}
+        {row.original.total_products ?? 0}
       </div>
     ),
   },

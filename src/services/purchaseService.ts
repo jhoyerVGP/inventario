@@ -1,271 +1,312 @@
 import { supabase } from "@/api/supabaseClient";
-import type { Purchase, PurchaseDetailInput } from "@/types/purchase";
-import type { TableParams } from "@/components/common/tabla/api";
+import type { PurchaseFormValues } from "@/schemes/purchase";
+import type { PurchaseRow, PurchaseWithDetails } from "@/types/purchase";
 
-// Get purchases with filters
-export const getPurchases = async (
-  params: TableParams,
-  branchId?: string,
-  supplierId?: string
-) => {
-  const from = (params.pageIndex - 1) * params.pageSize;
-  const to = from + params.pageSize - 1;
+// ── Lista paginada ──────────────────────────────────────────────
+import type { ServerTableParams } from "@/components/common/tabla/useServerTableState";
+
+// ── Lista paginada ──────────────────────────────────────────────
+export const getPurchases = async (params: ServerTableParams) => {
+  const from = (params.page - 1) * params.limit;
+  const to = from + params.limit - 1;
 
   let query = supabase
     .from("purchases")
     .select(
       `
-      *,
-      suppliers:supplierid(name),
-      branches:branchid(branchName),
-      users:userid(email)
-    `,
-      { count: "exact" }
-    );
+    id, total, status, notes, created_at, updated_at,
+    supplierid, branchid, userid,
+    suppliers ( name ),
+    branches  ( branchName ),
+    users     ( employees ( name ) )
+  `,
+      { count: "exact" },
+    )
+    .order(params.sortField, { ascending: params.sortOrder === "asc" })
+    .range(from, to);
 
-  if (branchId) {
-    query = query.eq("branchid", branchId);
+  if (params.search) {
+    query = query.ilike("suppliers.name", `%${params.search}%`);
   }
-
-  if (supplierId) {
-    query = query.eq("supplierid", supplierId);
-  }
-
-  // Aplicar búsqueda global
-  if (params.globalFilter) {
-    query = query.or(
-      `id.ilike.%${params.globalFilter}%,notes.ilike.%${params.globalFilter}%`
-    );
-  }
-
-  // Ordenamiento
-  if (params.sorting?.length > 0) {
-    const sortConfig = params.sorting[0];
-    query = query.order(sortConfig.id, {
-      ascending: sortConfig.desc === false,
-    });
-  } else {
-    query = query.order("created_at", { ascending: false });
-  }
-
-  const { data, error, count } = await query.range(from, to);
-
+  const { data, error, count } = await query;
   if (error) throw new Error(error.message);
 
-  // Transformar datos para UI
-  const formatted = data?.map((p) => ({
-    ...p,
-    supplier_name: (p.suppliers as any)?.name,
-    branch_name: (p.branches as any)?.branchName,
-    user_email: (p.users as any)?.email,
-  }));
+  const normalizePurchaseRow = (row: any): PurchaseRow => {
+    const supplier = Array.isArray(row?.suppliers)
+      ? row.suppliers[0]
+      : row?.suppliers;
+    const branch = Array.isArray(row?.branches)
+      ? row.branches[0]
+      : row?.branches;
+    const user = Array.isArray(row?.users) ? row.users[0] : row?.users;
+    const employee = Array.isArray(user?.employees)
+      ? user.employees[0]
+      : user?.employees;
+
+    return {
+      id: row?.id,
+      total: row?.total,
+      status: row?.status,
+      notes: row?.notes ?? null,
+      created_at: row?.created_at,
+      updated_at: row?.updated_at,
+      supplierid: row?.supplierid ?? null,
+      branchid: row?.branchid,
+      userid: row?.userid,
+      suppliers: supplier ? { name: supplier.name } : null,
+      branches: branch ? { branchName: branch.branchName } : null,
+      users: employee ? { employees: { name: employee.name } } : null,
+    };
+  };
 
   return {
-    data: formatted as Purchase[],
-    rowCount: count || 0,
+    data: (data ?? []).map(normalizePurchaseRow),
+    meta: {
+      total: count || 0,
+      page: params.page,
+      limit: params.limit,
+      totalPages: Math.ceil((count || 0) / params.limit),
+    },
   };
 };
 
-// Get purchase by ID with details
-export const getPurchaseById = async (id: string) => {
-  const { data: purchase, error: purchaseError } = await supabase
+// ── Detalle de una compra ───────────────────────────────────────
+export const getPurchaseById = async (
+  id: string,
+): Promise<PurchaseWithDetails> => {
+  const { data, error } = await supabase
     .from("purchases")
     .select(
       `
-      *,
-      suppliers:supplierid(name, phone, email),
-      branches:branchid(branchName),
-      users:userid(email)
-    `
+      id, total, status, notes, created_at, updated_at,
+      supplierid, branchid, userid,
+      suppliers ( name ),
+      branches  ( branchName ),
+      users     ( employees ( name ) ),
+      purchasedetails (
+        productid, quantity, unitcost, total,
+        products ( nameProd, sku )
+      )
+    `,
     )
     .eq("id", id)
     .single();
 
-  if (purchaseError) throw new Error(purchaseError.message);
-
-  // Obtener detalles
-  const { data: details, error: detailsError } = await supabase
-    .from("purchasedetails")
-    .select(
-      `
-      *,
-      products:productid(nameProd, unit)
-    `
-    )
-    .eq("purchaseid", id);
-
-  if (detailsError) throw new Error(detailsError.message);
-
-  return {
-    ...purchase,
-    supplier_name: (purchase.suppliers as any)?.name,
-    branch_name: (purchase.branches as any)?.branchName,
-    user_email: (purchase.users as any)?.email,
-    details: details?.map((d) => ({
-      ...d,
-      nameProd: (d.products as any)?.nameProd,
-      unit: (d.products as any)?.unit,
-    })),
-  } as Purchase;
+  if (error) throw new Error(error.message);
+  return data as unknown as PurchaseWithDetails; // ← único lugar donde usamos unknown
 };
 
-// Create purchase
-export const createPurchase = async (
-  supplierId: string,
-  branchId: string,
-  userId: string,
-  details: PurchaseDetailInput[],
-  notes?: string
-) => {
-  // Calcular total
-  const total = details.reduce((sum, d) => sum + d.quantity * d.unitcost, 0);
-
-  // Crear compra
-  const { data: purchase, error: purchaseError } = await supabase
+// ── Actualizar compra + detalles (solo borrador) ────────────────
+export const updatePurchase = async (
+  id: string,
+  formValues: PurchaseFormValues,
+): Promise<string> => {
+  const { data: current, error: currentError } = await supabase
     .from("purchases")
-    .insert({
-      supplierid: supplierId,
-      branchid: branchId,
-      userid: userId,
-      total,
-      notes: notes || null,
-      status: "RECEIVED",
-    })
-    .select()
+    .select("status")
+    .eq("id", id)
     .single();
+
+  if (currentError) throw new Error(currentError.message);
+  if (current?.status !== "DRAFT") {
+    throw new Error("Solo se pueden editar compras en borrador");
+  }
+
+  const total = formValues.rows.reduce(
+    (acc, r) => acc + r.quantity * r.unitCost,
+    0,
+  );
+
+  const { error: deleteDetailsError } = await supabase
+    .from("purchasedetails")
+    .delete()
+    .eq("purchaseid", id);
+
+  if (deleteDetailsError) throw new Error(deleteDetailsError.message);
+
+  const { error: purchaseError } = await supabase
+    .from("purchases")
+    .update({
+      supplierid: formValues.supplierid,
+      branchid: formValues.branchid,
+      notes: formValues.notes || null,
+      total,
+    })
+    .eq("id", id);
 
   if (purchaseError) throw new Error(purchaseError.message);
 
-  // Crear detalles
-  const detailsWithPurchaseId = details.map((d) => ({
-    purchaseid: purchase.id,
-    productid: d.productid,
-    quantity: d.quantity,
-    unitcost: d.unitcost,
-    total: d.quantity * d.unitcost,
+  const details = formValues.rows.map((r) => ({
+    purchaseid: id,
+    productid: r.productId,
+    quantity: r.quantity,
+    unitcost: r.unitCost,
+    total: r.quantity * r.unitCost,
   }));
 
   const { error: detailsError } = await supabase
     .from("purchasedetails")
-    .insert(detailsWithPurchaseId);
+    .insert(details);
 
   if (detailsError) throw new Error(detailsError.message);
 
-  // Retornar compra con detalles
-  return getPurchaseById(purchase.id);
+  return id;
 };
 
-// Update purchase (solo status y notes, no detalles)
-export const updatePurchase = async (
-  id: string,
-  updates: {
-    status?: "PENDING" | "RECEIVED" | "CANCELLED";
-    notes?: string;
+// ── Eliminar compra + detalles ─────────────────────────────────
+export const deletePurchase = async (id: string): Promise<void> => {
+  const { data: current, error: currentError } = await supabase
+    .from("purchases")
+    .select("status")
+    .eq("id", id)
+    .single();
+
+  if (currentError) throw new Error(currentError.message);
+  if (current?.status !== "DRAFT") {
+    throw new Error("Solo se pueden eliminar compras en borrador");
   }
-) => {
+
+  const { error: detailsError } = await supabase
+    .from("purchasedetails")
+    .delete()
+    .eq("purchaseid", id);
+
+  if (detailsError) throw new Error(detailsError.message);
+
+  const { error } = await supabase.from("purchases").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+};
+
+// ── Confirmar compra (aplica stock via trigger) ────────────────
+export const confirmPurchase = async (id: string): Promise<void> => {
   const { data, error } = await supabase
     .from("purchases")
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ status: "CONFIRMED" })
     .eq("id", id)
-    .select()
+    .eq("status", "DRAFT")
+    .select("id")
     .single();
 
   if (error) throw new Error(error.message);
-  return data as Purchase;
+  if (!data) throw new Error("La compra ya fue confirmada");
 };
 
-// Cancel purchase (revierte el stock via trigger)
-export const cancelPurchase = async (id: string) => {
-  return updatePurchase(id, { status: "CANCELLED" });
-};
+// ── Crear compra + detalles (borrador, no afecta stock) ─────────
+export const createPurchase = async (
+  formValues: PurchaseFormValues,
+  userId: string,
+): Promise<string> => {
+  const status = formValues.status ?? "DRAFT";
+  const total = formValues.rows.reduce(
+    (acc, r) => acc + r.quantity * r.unitCost,
+    0,
+  );
 
-// Get purchase details
-export const getPurchaseDetails = async (purchaseId: string) => {
-  const { data, error } = await supabase
-    .from("purchasedetails")
-    .select(
-      `
-      *,
-      products:productid(nameProd, unit, sku)
-    `
-    )
-    .eq("purchaseid", purchaseId);
-
-  if (error) throw new Error(error.message);
-
-  return data?.map((d) => ({
-    ...d,
-    nameProd: (d.products as any)?.nameProd,
-    unit: (d.products as any)?.unit,
-    sku: (d.products as any)?.sku,
-  }));
-};
-
-// Get low stock products by branch
-export const getLowStockProductsByBranch = async (branchId: string) => {
-  const { data, error } = await supabase
-    .from("branchStocks")
-    .select(
-      `
-      *,
-      products:productId(nameProd, minstock, unit, id),
-      branches:branchId(branchName)
-    `
-    )
-    .eq("branchId", branchId)
-    .lte("stock", supabase.raw("(SELECT minstock FROM products WHERE id = products.id)"));
-
-  if (error) throw new Error(error.message);
-
-  // Alternativa: Filtrar en frontend si la query rte anterior no funciona
-  return data
-    ?.map((bs) => ({
-      productId: (bs.products as any)?.id,
-      nameProd: (bs.products as any)?.nameProd,
-      minstock: (bs.products as any)?.minstock,
-      unit: (bs.products as any)?.unit,
-      stock: bs.stock,
-      branchId,
-    }))
-    .filter((item) => item.stock <= (item.minstock || 0)) as any[];
-};
-
-// Get total sales by branch and date range
-export const getPurchasesByDateRange = async (
-  branchId: string,
-  startDate: Date,
-  endDate: Date,
-  supplierId?: string
-) => {
-  let query = supabase
+  // 1. Insertar cabecera
+  const { data: purchase, error: purchaseError } = await supabase
     .from("purchases")
-    .select(
-      `
-      *,
-      suppliers:supplierid(name),
-      branches:branchid(branchName)
-    `
-    )
-    .eq("branchid", branchId)
-    .gte("created_at", startDate.toISOString())
-    .lte("created_at", endDate.toISOString());
+    .insert({
+      supplierid: formValues.supplierid,
+      branchid: formValues.branchid,
+      userid: userId,
+      notes: formValues.notes || null,
+      total,
+      status: "DRAFT",
+    })
+    .select("id")
+    .single();
 
-  if (supplierId) {
-    query = query.eq("supplierid", supplierId);
+  if (purchaseError) throw new Error(purchaseError.message);
+
+  // 2. Insertar detalles (no impacta stock hasta confirmar)
+  const details = formValues.rows.map((r) => ({
+    purchaseid: purchase.id,
+    productid: r.productId,
+    quantity: r.quantity,
+    unitcost: r.unitCost,
+    total: r.quantity * r.unitCost,
+  }));
+
+  const { error: detailsError } = await supabase
+    .from("purchasedetails")
+    .insert(details);
+
+  if (detailsError) throw new Error(detailsError.message);
+
+  if (status === "CONFIRMED") {
+    const { error: confirmError } = await supabase
+      .from("purchases")
+      .update({ status: "CONFIRMED" })
+      .eq("id", purchase.id)
+      .eq("status", "DRAFT");
+
+    if (confirmError) throw new Error(confirmError.message);
   }
 
-  const { data, error } = await query.order("created_at", {
-    ascending: false,
-  });
+  return purchase.id;
+};
+
+// ── Proveedores para el select ──────────────────────────────────
+export const getSuppliers = async () => {
+  const { data, error } = await supabase
+    .from("suppliers")
+    .select("id, name")
+    .eq("activo", true)
+    .is("deleted_at", null)
+    .order("name");
+
+  if (error) throw new Error(error.message);
+  return data || [];
+};
+
+// ── Productos con stock actual (para buscar en el form) ─────────
+export const getProductsForPurchase = async (branchId: string) => {
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `
+      id, nameProd, sku, cost,
+      branchStocks ( stock, branchId )
+    `, // ← sin !inner
+    )
+    .is("deleted_at", null)
+    .order("nameProd");
 
   if (error) throw new Error(error.message);
 
-  return data?.map((p) => ({
-    ...p,
-    supplier_name: (p.suppliers as any)?.name,
-    branch_name: (p.branches as any)?.branchName,
-  })) as Purchase[];
+  return (data || []).map((p) => {
+    const stockEntry = (p.branchStocks as any[])?.find(
+      (s) => s.branchId === branchId,
+    );
+    return {
+      id: p.id,
+      nameProd: p.nameProd,
+      sku: p.sku,
+      cost: p.cost ?? 0,
+      currentStock: stockEntry?.stock ?? 0, // 0 si no tiene stock aún
+    };
+  });
 };
+/* export const getProductsForPurchase = async (branchId: string) => {
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `
+      id, nameProd, sku, cost,
+      branchStocks!inner ( stock, branchId )
+    `,
+    )
+    .is("deleted_at", null)
+    .eq("branchStocks.branchId", branchId)
+    .order("nameProd");
+
+  if (error) throw new Error(error.message);
+  return (data || []).map((p) => ({
+    id: p.id,
+    nameProd: p.nameProd,
+    sku: p.sku,
+    cost: p.cost ?? 0,
+    currentStock: (p.branchStocks as any)?.[0]?.stock ?? 0,
+  }));
+};
+ */
