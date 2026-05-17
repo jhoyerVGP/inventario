@@ -134,7 +134,7 @@ export function KpiGrid({ data, isLoading, isError, onRetry }: KpiGridProps) {
   ] as const;
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
       {kpis.map((kpi) => (
         <KpiCard key={`kpi-card-${kpi.title}`} {...kpi} />
       ))}

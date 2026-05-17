@@ -62,26 +62,35 @@ export function KpiCard({
   const cfg = trendConfig[trend];
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-3 hover:shadow-sm transition-shadow">
-      <div className="flex items-start justify-between">
-        <p className="text-xs font-medium text-muted-foreground leading-tight max-w-[70%]">
+    <div className="flex h-full min-w-0 flex-col gap-2 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-sm sm:gap-3 sm:p-5">
+      <div className="flex items-start justify-between gap-2">
+        <p className="min-w-0 flex-1 text-xs font-medium leading-snug text-muted-foreground line-clamp-2">
           {title}
         </p>
-        <div className={cn("p-2 rounded-lg", iconBg)}>{icon}</div>
+        <div
+          className={cn(
+            "shrink-0 rounded-lg p-1.5 sm:p-2 [&_svg]:size-3.5 sm:[&_svg]:size-4",
+            iconBg,
+          )}
+        >
+          {icon}
+        </div>
       </div>
 
-      <div>
-        <p className="text-2xl font-semibold text-foreground tracking-tight">
+      <div className="min-w-0">
+        <p className="text-xl font-semibold tracking-tight text-foreground break-words sm:text-2xl">
           {value}
         </p>
         {subtitle && (
-          <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {subtitle}
+          </p>
         )}
       </div>
 
       <div
         className={cn(
-          "flex items-center gap-1 text-xs font-medium",
+          "mt-auto flex min-w-0 flex-wrap items-center gap-x-1 gap-y-0.5 text-xs font-medium",
           cfg.className,
         )}
       >
