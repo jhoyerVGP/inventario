@@ -3,6 +3,7 @@ import { es } from "date-fns/locale";
 import { RefreshCw, CalendarDays, Store } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DateRangePreset } from "@/reports/types/filters.types";
+import { Button } from "@/components/ui/button";
 
 interface DashboardHeaderProps {
   nameBranch: string | null;
@@ -42,8 +43,8 @@ export function DashboardHeader({
     <div className="flex flex-col gap-3">
       {/* Top row */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground lg:text-2xl">
+        <div className="flex flex-col gap-1 lg:gap-2">
+          <h1 className="text-xl font-semibold text-foreground lg:text-3xl">
             Resumen operativo
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">{todayCap}</p>
@@ -79,18 +80,15 @@ export function DashboardHeader({
       {/* Preset pills */}
       <div className="flex items-center gap-1.5 flex-wrap">
         {PRESETS.map((p) => (
-          <button
+          <Button
+            className="text-xs lg:text-sm rounded-lg border transition-colors"
             key={`dashboard-preset-${p.value}`}
+            variant={preset === p.value ? "default" : "outline"}
             onClick={() => onPresetChange(p.value)}
-            className={cn(
-              "text-xs px-3 py-1.5 rounded-lg border transition-colors",
-              preset === p.value
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border text-muted-foreground hover:bg-muted",
-            )}
+            size="sm"
           >
             {p.label}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

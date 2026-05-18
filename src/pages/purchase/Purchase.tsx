@@ -77,11 +77,11 @@ export default function Purchases() {
   };
 
   return (
-    <div className="bg-background-view h-full">
+    <div className="bg-background h-full">
       <div className="h-[calc(100vh-54px)] flex flex-col max-w-7xl mx-auto py-2 gap-2 px-4">
         <div className="flex flex-col gap-3 justify-between md:items-center shrink-0 md:flex-row">
           <h1 className="tracking-wide font-title text-xl text-foreground lg:text-2xl">
-            Compras
+            Lista de Compras
           </h1>
           <Button asChild className="btn-create w-full md:w-auto">
             <Link to="create-purchase">

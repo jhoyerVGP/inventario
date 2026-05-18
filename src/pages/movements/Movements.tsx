@@ -45,7 +45,7 @@ const Movements = () => {
   };
 
   return (
-    <div className="bg-background-view h-full">
+    <div className="bg-background h-full">
       <div className="h-[calc(100vh-54px)] flex flex-col max-w-7xl mx-auto py-2 gap-2 px-4 itmes-between">
         <div className="flex flex-col md:flex-row md:items-center justify-between shrink-0">
           <h1

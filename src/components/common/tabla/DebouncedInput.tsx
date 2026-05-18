@@ -26,9 +26,9 @@ export function DebouncedInput({
   }, [value]);
 
   return (
-    <div className="relative w-full max-w-[425px]">
+    <div className="relative w-full min-w-0 sm:max-w-md">
       {/* Ícono de búsqueda a la izquierda */}
-      <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
       {/* Input con padding para el ícono */}
       <Input
@@ -36,14 +36,15 @@ export function DebouncedInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="pl-8 pr-10"
+        className="h-9 bg-card pl-9 pr-9 font-body shadow-xs"
       />
 
       {/* Botón para limpiar (solo visible cuando hay texto) */}
       {value && (
         <button
           onClick={() => setValue("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-card hover:text-foreground-card/80 transition-colors"
+          className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          aria-label="Limpiar búsqueda"
           type="button"
         >
           <X className="h-4 w-4" />

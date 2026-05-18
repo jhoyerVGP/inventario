@@ -216,6 +216,10 @@
 }
 
 @theme inline {
+  /* === TIPOGRAFÍA (Tailwind) === */
+  --font-title: var(--font-title);
+  --font-body: var(--font-body);
+
   /* === RADIOS === */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -325,5 +329,113 @@
   h6 {
     font-family: var(--font-title);
     font-weight: 600;
+  }
+}
+
+@layer utilities {
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-title {
+    font-family: var(--font-title);
+  }
+}
+
+@layer components {
+  /* Tabla de datos — estilos compartidos (light/dark vía tokens) */
+  .data-table-shell {
+    @apply flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-border bg-card font-body shadow-sm;
+  }
+
+  .data-table-scroll {
+    @apply min-h-0 flex-1 overflow-x-auto overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table-footer {
+    @apply shrink-0 border-t border-border bg-card px-3 py-3 sm:px-4;
+  }
+
+  /* Cabecera/cuerpo: mismo tamaño (text-sm); color distingue jerarquía */
+  .data-table-th {
+    @apply h-10 px-3 py-2.5 text-left align-middle text-sm font-medium text-muted-foreground sm:h-11 sm:px-4 sm:py-3;
+  }
+
+  .data-table-td {
+    @apply px-3 py-2.5 align-middle text-sm text-card-foreground sm:px-4 sm:py-3;
+  }
+
+  .data-table-row {
+    @apply border-b border-border transition-colors hover:bg-muted/40;
+  }
+
+  .data-table-head {
+    @apply sticky top-0 z-20 border-b border-border bg-card;
+  }
+
+  /* Tabla inline en formularios (ej. Nueva Compra) */
+  .form-table-card {
+    @apply overflow-hidden rounded-xl border border-border bg-card font-body shadow-sm;
+  }
+
+  .form-table-toolbar {
+    @apply flex flex-col gap-3 border-b border-border bg-card px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4;
+  }
+
+  .form-table-scroll {
+    @apply w-full max-h-[min(50vh,28rem)] overflow-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .form-table {
+    @apply w-full caption-bottom text-sm;
+  }
+
+  @media (max-width: 639px) {
+    .form-table {
+      min-width: 36rem;
+    }
+  }
+
+  .form-table-head {
+    @apply border-b border-border bg-card;
+  }
+
+  .form-table-th {
+    @apply px-3 py-2.5 text-sm font-medium text-muted-foreground sm:px-4;
+  }
+
+  .form-table-td {
+    @apply px-3 py-2 text-sm text-card-foreground sm:px-4 sm:py-2.5;
+  }
+
+  .form-table-row {
+    @apply border-t border-border transition-colors hover:bg-muted/40;
+  }
+
+  .form-table-foot {
+    @apply border-t border-border bg-card;
+  }
+
+  /* Tabla en modales (detalle compra, etc.) */
+  .modal-table-wrap {
+    @apply min-w-0 overflow-hidden rounded-xl border border-border bg-card;
+  }
+
+  /* Scroll X en móvil; scroll Y si hay muchas filas; en desktop sin min-width forzado */
+  .modal-table-scroll {
+    @apply w-full max-h-[min(38vh,18rem)] overflow-auto sm:max-h-[min(44vh,22rem)];
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-table {
+    @apply w-full caption-bottom text-sm;
+  }
+
+  @media (max-width: 639px) {
+    .modal-table {
+      min-width: 32rem;
+    }
   }
 }

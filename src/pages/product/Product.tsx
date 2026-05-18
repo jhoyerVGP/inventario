@@ -185,7 +185,7 @@ export default function Product() {
   };
 
   return (
-    <div className="bg-background-view h-full">
+    <div className="bg-background h-full">
       <div className="h-[calc(100vh-54px)] flex flex-col max-w-7xl mx-auto py-2 gap-2 px-4">
         <div
           className="flex flex-col gap-3 justify-between md:items-center shrink-0

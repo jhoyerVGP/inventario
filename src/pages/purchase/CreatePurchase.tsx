@@ -39,6 +39,7 @@ import {
 import { ArrowLeft, PackagePlus, Trash2, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useBranches } from "@/hooks/branch/useGetBranchesAll";
+import { CreatePurchaseSkeleton } from "./CreatePurchaseSkeleton";
 
 export default function CreatePurchase() {
   const { user } = useAuth();
@@ -202,35 +203,36 @@ export default function CreatePurchase() {
   });
 
   if (isSuppliersLoading || isBranchesLoading || isPurchaseLoading) {
-    return (
-      <div className="p-4">
-        <p className="text-center text-muted-foreground">Cargando...</p>
-      </div>
-    );
+    return <CreatePurchaseSkeleton isEditMode={isEditMode} />;
   }
 
   return (
-    <div className="bg-background-view min-h-full">
-      <div className="max-w-6xl mx-auto py-4 px-4 flex flex-col gap-4">
+    <div className="min-h-full w-full bg-background-view font-body">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0"
+            onClick={() => navigate(-1)}
+          >
             <ArrowLeft size={16} />
           </Button>
-          <h1 className="tracking-wide font-title text-xl text-foreground lg:text-2xl">
+          <h1 className="font-title min-w-0 truncate text-xl tracking-tight text-foreground sm:text-2xl">
             {isEditMode ? "Editar Compra" : "Nueva Compra"}
           </h1>
         </div>
 
         {isReadOnly && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-300 sm:px-4">
             Esta compra esta confirmada y no se puede editar.
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           {/* ── Sección superior ─────────────────────────── */}
-          <div className="bg-card border rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 rounded-xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
             {/* Proveedor */}
             <div className="flex flex-col gap-1.5">
               <Label>
@@ -333,22 +335,23 @@ export default function CreatePurchase() {
             )}
 
             {/* Notas */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
               <Label>Notas</Label>
               <Textarea
                 {...register("notes")}
                 placeholder="Observaciones opcionales..."
-                className="resize-none h-[38px] min-h-[38px]"
+                className="min-h-[2.75rem] resize-none"
                 disabled={isReadOnly}
               />
             </div>
           </div>
 
           {/* ── Tabla de productos ────────────────────────── */}
-          <div className="bg-card border rounded-xl overflow-hidden">
-            {/* Toolbar de la tabla */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <p className="font-medium text-sm">Productos a comprar</p>
+          <div className="form-table-card">
+            <div className="form-table-toolbar">
+              <p className="text-sm font-medium text-card-foreground">
+                Productos a comprar
+              </p>
 
               {/* Buscador de productos */}
               <Popover open={productOpen} onOpenChange={setProductOpen}>
@@ -357,10 +360,10 @@ export default function CreatePurchase() {
                     variant="outline"
                     size="sm"
                     disabled={!watchedBranchId || isReadOnly}
-                    className="gap-2"
+                    className="w-full shrink-0 gap-2 sm:w-auto"
                   >
                     <PackagePlus size={15} />
-                    Agregar producto
+                    <span className="truncate">Agregar producto</span>
                     <ChevronsUpDown size={13} className="opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -405,26 +408,26 @@ export default function CreatePurchase() {
               </p>
             )}
 
-            {/* Tabla */}
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-muted-foreground">
+            <div className="form-table-scroll">
+            <table className="form-table">
+              <thead className="form-table-head">
                 <tr>
-                  <th className="text-left px-4 py-2.5 font-medium">
+                  <th className="form-table-th min-w-[10rem] text-left">
                     Producto
                   </th>
-                  <th className="text-right px-4 py-2.5 font-medium w-24">
+                  <th className="form-table-th w-24 text-right whitespace-nowrap">
                     Stock actual
                   </th>
-                  <th className="text-right px-4 py-2.5 font-medium w-28">
+                  <th className="form-table-th w-28 text-right whitespace-nowrap">
                     Cantidad
                   </th>
-                  <th className="text-right px-4 py-2.5 font-medium w-32">
+                  <th className="form-table-th w-32 text-right whitespace-nowrap">
                     Costo unitario
                   </th>
-                  <th className="text-right px-4 py-2.5 font-medium w-28">
+                  <th className="form-table-th w-28 text-right whitespace-nowrap">
                     Subtotal
                   </th>
-                  <th className="w-12" />
+                  <th className="form-table-th w-12" />
                 </tr>
               </thead>
               <tbody>
@@ -432,7 +435,7 @@ export default function CreatePurchase() {
                   <tr>
                     <td
                       colSpan={6}
-                      className="text-center text-muted-foreground py-10"
+                      className="form-table-td py-10 text-center text-muted-foreground"
                     >
                       {watchedBranchId
                         ? "Agrega productos usando el botón de arriba"
@@ -446,19 +449,21 @@ export default function CreatePurchase() {
                   const subtotal = qty * cost;
 
                   return (
-                    <tr key={field.id} className="border-t hover:bg-muted/30">
+                    <tr key={field.id} className="form-table-row">
                       {/* Nombre */}
-                      <td className="px-4 py-2">
-                        <span className="font-medium">{field.productName}</span>
+                      <td className="form-table-td">
+                        <span className="font-medium text-card-foreground">
+                          {field.productName}
+                        </span>
                       </td>
 
                       {/* Stock actual */}
-                      <td className="px-4 py-2 text-right text-muted-foreground">
+                      <td className="form-table-td text-right text-muted-foreground">
                         {field.currentStock}
                       </td>
 
                       {/* Cantidad */}
-                      <td className="px-4 py-2 text-right">
+                      <td className="form-table-td text-right">
                         <Input
                           type="number"
                           min={1}
@@ -476,7 +481,7 @@ export default function CreatePurchase() {
                       </td>
 
                       {/* Costo unitario */}
-                      <td className="px-4 py-2 text-right">
+                      <td className="form-table-td text-right">
                         <Input
                           type="number"
                           min={0}
@@ -495,12 +500,12 @@ export default function CreatePurchase() {
                       </td>
 
                       {/* Subtotal */}
-                      <td className="px-4 py-2 text-right font-medium">
+                      <td className="form-table-td text-right font-medium text-card-foreground">
                         Bs. {subtotal.toFixed(2)}
                       </td>
 
                       {/* Eliminar */}
-                      <td className="px-2 py-2 text-center">
+                      <td className="form-table-td text-center">
                         <Button
                           type="button"
                           variant="ghost"
@@ -519,15 +524,15 @@ export default function CreatePurchase() {
 
               {/* Footer con total */}
               {fields.length > 0 && (
-                <tfoot className="border-t bg-muted/50">
+                <tfoot className="form-table-foot">
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-4 py-3 text-right font-semibold"
+                      className="form-table-td py-3 text-right text-sm font-semibold text-card-foreground"
                     >
                       Total
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-base">
+                    <td className="form-table-td py-3 text-right text-sm font-semibold text-card-foreground">
                       Bs. {grandTotal.toFixed(2)}
                     </td>
                     <td />
@@ -535,13 +540,15 @@ export default function CreatePurchase() {
                 </tfoot>
               )}
             </table>
+            </div>
           </div>
 
           {/* ── Botones ───────────────────────────────────── */}
-          <div className="flex justify-end gap-3 pb-4">
+          <div className="flex flex-col-reverse gap-2 pb-2 sm:flex-row sm:justify-end sm:gap-3 sm:pb-4">
             <Button
               type="button"
               variant="outline"
+              className="w-full sm:w-auto"
               onClick={() => navigate(-1)}
             >
               Cancelar
@@ -554,7 +561,7 @@ export default function CreatePurchase() {
                   updatePurchase.isPending ||
                   confirmPurchase.isPending
                 }
-                className="btn-create"
+                className="btn-create w-full sm:w-auto"
               >
                 {createPurchase.isPending || updatePurchase.isPending
                   ? isEditMode
@@ -574,7 +581,7 @@ export default function CreatePurchase() {
                   confirmPurchase.isPending ||
                   createPurchase.isPending
                 }
-                className="btn-create"
+                className="btn-create w-full sm:w-auto"
               >
                 {confirmPurchase.isPending ? "Confirmando..." : "Confirmar Compra"}
               </Button>

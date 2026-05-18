@@ -139,7 +139,7 @@ const SuppliersPage = () => {
   ];
 
   return (
-    <div className="bg-background-view h-full w-full">
+    <div className="bg-background h-full w-full">
       <div className="h-[calc(100vh-54px)] flex flex-col max-w-7xl mx-auto py-2 gap-2 px-4">
         <div className="flex flex-col gap-3 justify-between md:items-center md:flex-row relative">
           <h1 className="text-2xl font-semibold">Proveedores</h1>

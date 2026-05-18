@@ -16,33 +16,34 @@ export function Pagination({
   canNextPage,
 }: PaginationProps) {
   return (
-    <div className="flex items-center gap-1">
-      {/* Información de página: Muy útil para el usuario */}
-      <div className="flex items-center gap-1 text-sm font-medium text-card-foreground bg-card/10 px-1 py-1.5">
-        <span className="text-muted-foreground hidden md:block">Página</span>
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className="flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1.5 text-sm font-medium text-card-foreground">
+        <span className="hidden text-muted-foreground md:inline">Página</span>
         <span className="text-muted-foreground md:hidden">Pág.</span>
-        <span>{currentPage}</span>
+        <span className="text-foreground">{currentPage}</span>
         <span className="text-muted-foreground">de</span>
-        <span>{totalPages || 1}</span>
+        <span className="text-foreground">{totalPages || 1}</span>
       </div>
 
       <div className="flex items-center gap-1">
         <button
+          type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!canPreviousPage}
-          className="p-2 text-card-foreground bg-card border border-ring rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
+          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-input bg-card text-card-foreground shadow-xs transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
           title="Anterior"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-4 w-4" />
         </button>
 
         <button
+          type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={!canNextPage}
-          className="p-2 text-card-foreground bg-card border border-ring rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
+          className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-input bg-card text-card-foreground shadow-xs transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
           title="Siguiente"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
     </div>

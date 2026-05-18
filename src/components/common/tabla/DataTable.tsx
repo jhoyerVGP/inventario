@@ -10,6 +10,7 @@ import {
 
 import { Pagination } from "./Paginacion";
 import { ArrowUp, ArrowDown, ChevronsUpDown, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,22 +52,20 @@ export function DataTable<TData, TValue>({
   const hasError = !isLoading && isError;
 
   return (
-    <div className="flex flex-col h-full min-h-[500px] w-full bg-card rounded-xl border border-border shadow-sm relative">
+    <div className="data-table-shell relative min-h-[min(100%,28rem)] sm:min-h-[min(100%,24rem)]">
       {/* Loading State */}
       {isLoading && (
-        <div className="absolute inset-0 bg-card backdrop-blur-sm z-40 flex items-center justify-center">
+        <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-card/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4">
-            {/* Spinner animado */}
             <div className="relative">
-              <div className="w-16 h-16 border-4 border-border rounded-full"></div>
-              <div className="w-16 h-16 border-4 border-chart-3 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+              <div className="h-12 w-12 rounded-full border-4 border-muted sm:h-14 sm:w-14" />
+              <div className="absolute left-0 top-0 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent sm:h-14 sm:w-14" />
             </div>
-
             <div className="text-center">
-              <p className="text-sm font-semibold text-card-foreground">
+              <p className="text-sm font-medium text-card-foreground">
                 Cargando datos
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Por favor espera...
               </p>
             </div>
@@ -75,11 +74,11 @@ export function DataTable<TData, TValue>({
       )}
       {/* Error State */}
       {hasError && (
-        <div className="absolute inset-0 bg-card z-40 flex items-center justify-center p-8">
-          <div className="flex flex-col items-center gap-4 max-w-md text-center">
-            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+        <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-card p-6 sm:p-8">
+          <div className="flex max-w-md flex-col items-center gap-4 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 sm:h-16 sm:w-16">
               <svg
-                className="w-8 h-8 text-destructive"
+                className="h-7 w-7 text-destructive sm:h-8 sm:w-8"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -93,7 +92,7 @@ export function DataTable<TData, TValue>({
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-card-foreground mb-2">
+              <h3 className="font-title mb-2 text-base font-semibold text-card-foreground sm:text-lg">
                 Error al cargar datos
               </h3>
               <p className="text-sm text-muted-foreground">
@@ -103,7 +102,7 @@ export function DataTable<TData, TValue>({
             </div>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Reintentar
             </button>
@@ -112,13 +111,13 @@ export function DataTable<TData, TValue>({
       )}
       {/* Empty State */}
       {isEmpty && (
-        <div className="absolute inset-0 bg-card z-40 flex items-center justify-center p-8">
-          <div className="flex flex-col items-center gap-4 max-w-md text-center">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-              <Search className="w-10 h-10 text-muted-foreground" />
+        <div className="absolute inset-0 z-40 flex items-center justify-center rounded-xl bg-card p-6 sm:p-8">
+          <div className="flex max-w-md flex-col items-center gap-4 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted sm:h-20 sm:w-20">
+              <Search className="h-8 w-8 text-muted-foreground sm:h-10 sm:w-10" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-card-foreground mb-2">
+              <h3 className="font-title mb-2 text-base font-semibold text-card-foreground sm:text-lg">
                 No se encontraron resultados
               </h3>
               <p className="text-sm text-muted-foreground">
@@ -130,49 +129,50 @@ export function DataTable<TData, TValue>({
         </div>
       )}
       {/* Contenedor de la tabla */}
-      <div className="flex-1 overflow-auto rounded-xl h-full relative isolate w-full">
-        <table className="w-full table-auto text-left border-collapse rounded-xl">
-          <thead className="sticky top-0 z-30 bg-card">
+      <div className="data-table-scroll isolate">
+        <table className="w-full min-w-max caption-bottom text-sm">
+          <thead className="data-table-head">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr
-                key={`"${headerGroup.id}-data-table-tr"`}
-                className="bg-card border-b border-border"
-              >
+              <tr key={`"${headerGroup.id}-data-table-tr"`}>
                 {headerGroup.headers.map((header) => {
                   const isSorted = header.column.getIsSorted();
+                  const canSort = header.column.getCanSort();
 
                   return (
                     <th
                       key={`"${header.id}-data-table-th"`}
-                      className={`px-4 py-3.5 text-xs font-body bg-ring/10 uppercase transition-colors ${
-                        isSorted ? "text-primary" : "text-muted-foreground"
-                      }`}
+                      className={cn(
+                        "data-table-th",
+                        isSorted && "text-foreground",
+                      )}
                     >
                       {header.isPlaceholder ? null : (
                         <div
-                          className={
-                            header.column.getCanSort()
-                              ? "flex items-center gap-2 cursor-pointer select-none hover:text-primary transition-colors"
-                              : "flex items-center gap-2"
-                          }
+                          className={cn(
+                            "flex min-w-0 items-center gap-1.5",
+                            canSort &&
+                              "cursor-pointer select-none transition-colors hover:text-foreground",
+                          )}
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                          {header.column.getCanSort() && (
-                            <>
+                          <span className="truncate">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                          </span>
+                          {canSort && (
+                            <span className="shrink-0">
                               {isSorted === "asc" && (
-                                <ArrowUp className="w-3.5 h-3.5 text-primary" />
+                                <ArrowUp className="h-3.5 w-3.5 text-primary" />
                               )}
                               {isSorted === "desc" && (
-                                <ArrowDown className="w-3.5 h-3.5 text-primary" />
+                                <ArrowDown className="h-3.5 w-3.5 text-primary" />
                               )}
                               {!isSorted && (
-                                <ChevronsUpDown className="w-3.5 h-3.5 text-muted-foreground" />
+                                <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
                               )}
-                            </>
+                            </span>
                           )}
                         </div>
                       )}
@@ -182,18 +182,18 @@ export function DataTable<TData, TValue>({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-ring/10">
+          <tbody className="[&_tr:last-child]:border-0">
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={`"${row.id}-data-table-tbody-tr"`}
-                className="hover:bg-gray-50 transition-colors"
+                className="data-table-row"
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={`"${cell.id}-data-table-tbody-td"`}
-                    className="px-4 py-4 text-sm text-card-foreground align-top"
+                    className="data-table-td"
                   >
-                    <div className="min-h-12 flex items-center">
+                    <div className="flex min-h-9 min-w-0 items-center sm:min-h-10">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -208,18 +208,15 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* footer table */}
-      <div
-        className="px-1 py-2 bg-ring/10 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 rounded-b-xl
-      md:px-3 md:justify-around"
-      >
-        <div className="hidden sm:flex sm:justify-center sm:items-center gap-2 ">
-          <span className="font-body font-medium text-sm text-muted-foreground tracking-wider">
+      <div className="data-table-footer flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="hidden items-center gap-2 sm:flex">
+          <span className="text-sm font-medium text-muted-foreground">
             Mostrar:
           </span>
           <select
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
-            className="bg-card border border-border text-card-foreground text-sm rounded-lg focus:border-ring block p-1.5 shadow-sm hover:border-border transition-all outline-none cursor-pointer"
+            className="h-8 min-w-[4.25rem] cursor-pointer rounded-md border border-input bg-card px-2 text-sm text-card-foreground shadow-xs outline-none transition-[color,box-shadow] hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
           >
             {[10, 20, 30].map((pageSize) => (
               <option key={`${pageSize}-table-option-data`} value={pageSize}>
@@ -229,13 +226,10 @@ export function DataTable<TData, TValue>({
           </select>
         </div>
 
-        <div
-          className="flex items-center gap-4 w-full justify-center
-        md:w-auto"
-        >
+        <div className="flex w-full items-center justify-center gap-3 sm:w-auto">
           <div className="text-sm text-muted-foreground sm:hidden">
             Total:{" "}
-            <span className="font-bold text-muted-foreground">{rowCount}</span>
+            <span className="font-semibold text-foreground">{rowCount}</span>
           </div>
 
           <Pagination
@@ -247,22 +241,22 @@ export function DataTable<TData, TValue>({
           />
         </div>
 
-        <div className="hidden lg:block text-sm text-muted-foreground">
+        <div className="hidden text-center text-sm text-muted-foreground lg:block lg:text-right">
           Mostrando registros del{" "}
-          <span>
+          <span className="font-medium text-foreground">
             {table.getState().pagination.pageIndex *
               table.getState().pagination.pageSize +
               1}
           </span>{" "}
           al{" "}
-          <span>
+          <span className="font-medium text-foreground">
             {Math.min(
               (table.getState().pagination.pageIndex + 1) *
                 table.getState().pagination.pageSize,
               rowCount,
             )}
           </span>{" "}
-          de <span>{rowCount}</span>
+          de <span className="font-medium text-foreground">{rowCount}</span>
         </div>
       </div>
     </div>

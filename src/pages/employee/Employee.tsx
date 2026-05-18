@@ -153,7 +153,7 @@ export default function Employee() {
   const { user } = useAuth();
   const role = user?.role || "SINROLE";
   return (
-    <div className="bg-background-view h-full">
+    <div className="bg-background h-full">
       <div className="h-[calc(100vh-64px)] flex flex-col max-w-7xl mx-auto py-2 gap-2 px-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between shrink-0">
           <h1
