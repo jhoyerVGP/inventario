@@ -33,8 +33,7 @@ function formatNumber(value: number): string {
   return value.toLocaleString("es-BO");
 }
 
-export function KpiGrid({ data, isLoading, isError, onRetry }: KpiGridProps) {
-  // if (isLoading) return <KpiGridSkeleton />;
+export function KpiGrid({ data, isError, onRetry }: KpiGridProps) {
 
   if (isError) {
     return (

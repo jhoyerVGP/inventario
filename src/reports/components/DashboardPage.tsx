@@ -64,7 +64,7 @@ export default function DashboardPage() {
     branchId,
   );
 
-  console.log("salesDays", {
+/*   console.log("salesDays", {
     status: salesDaysQuery.status,
     isLoading: salesDaysQuery.isLoading,
     isError: salesDaysQuery.isError,
@@ -77,7 +77,7 @@ export default function DashboardPage() {
     isError: salesMonthsQuery.isError,
     error: salesMonthsQuery.error,
     data: salesMonthsQuery.data,
-  });
+  }); */
   const salesQuery = chartMode === "days" ? salesDaysQuery : salesMonthsQuery;
 
   // ── Rankings ───────────────────────────────────────────────────────────────
@@ -113,13 +113,13 @@ export default function DashboardPage() {
     setIsRefreshing(false);
   };
 
-  console.log("datos de venta", {
+ /*  console.log("datos de venta", {
     status: salesQuery.status,
     isLoading: salesQuery.isLoading,
     isError: salesQuery.isError,
     error: salesQuery.error,
     data: salesQuery.data,
-  });
+  }); */
 
   return (
     <div className="min-h-full h-full p-4 w-full bg-background overflow-y-auto">

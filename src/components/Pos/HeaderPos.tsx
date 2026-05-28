@@ -21,45 +21,62 @@ export const HeaderPos = (props: Props) => {
     isOpenShopping,
     setIsOpenShopping,
   } = props;
+
   return (
-    <header className="py-1 bg-card border-b border-border shadow-sm max-h-screen overflow-x-hidden">
-      <div className="mx-auto flex flex-col gap-2 md:gap-2 items-start justify-center">
+    <header className="w-full bg-card border-b border-border shadow-xs select-none">
+      <div className="mx-auto flex flex-col gap-3 py-3">
+        {/* Barra Principal: Buscador y Carrito */}
         <div className="w-full flex justify-between items-center gap-4 px-4">
-          <DebouncedInput
-            onChange={(value) => setSearch(String(value))}
-            debounce={300}
-            valueDafault={search}
-            placeholder="Buscar por nombre o cod. único..."
-          />
-          <ButtonShopping
-            isOpenShopping={isOpenShopping}
-            setIsOpenShopping={setIsOpenShopping}
-          />
+          <div className="flex-1 max-w-xl">
+            <DebouncedInput
+              onChange={(value) => setSearch(String(value))}
+              debounce={300}
+              valueDafault={search}
+              placeholder="Buscar por nombre o cod. único..."
+            />
+          </div>
+          <div className="flex-shrink-0">
+            <ButtonShopping
+              isOpenShopping={isOpenShopping}
+              setIsOpenShopping={setIsOpenShopping}
+            />
+          </div>
         </div>
-        <div className="flex w-full gap-2 overflow-x-auto py-2 px-4 scroll-smooth bg-ring/10">
-          <button
-            onClick={() => setCategory(null)}
-            className={`px-3 py-1 rounded-full text-sm font-body whitespace-nowrap transition-all cursor-pointer ${
-              category === null
-                ? "bg-brand text-brand-foreground"
-                : "bg-secondary border border-border text-secondary-foreground hover:bg-secondary/80"
-            } `}
-          >
-            Todos
-          </button>
-          {categories?.map((cat) => (
+
+        {/* Contenedor de Categorías (Scroll Horizontal Optimizado) */}
+        <div className="w-full border-t border-border/60 bg-muted/20">
+          <div className="flex w-full gap-2 overflow-x-auto py-2.5 px-4 scroll-smooth items-center no-scrollbar">
+            {/* Botón "Todos" */}
             <button
-              key={`section-category-filter-pos-${cat.id}`}
-              onClick={() => setCategory(cat.id)}
-              className={`px-3 py-1 rounded-full text-sm font-body whitespace-nowrap transition-all cursor-pointer ${
-                category === cat.id || (cat.nameCat === "Todos" && !category)
-                  ? "bg-brand text-brand-foreground"
-                  : "bg-background border border-border text-accent-foreground hover:bg-accent"
+              onClick={() => setCategory(null)}
+              className={`px-4 py-1.5 rounded-full text-xs font-body font-medium whitespace-nowrap transition-all duration-200 cursor-pointer border tracking-wide ${
+                category === null
+                  ? "bg-brand text-brand-foreground border-brand shadow-sm scale-[1.02]"
+                  : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
               }`}
             >
-              {cat.nameCat}
+              Todos
             </button>
-          ))}
+
+            {/* Mapeo de Categorías */}
+            {categories?.map((cat) => {
+              const isSelected =
+                category === cat.id || (cat.nameCat === "Todos" && !category);
+              return (
+                <button
+                  key={`section-category-filter-pos-${cat.id}`}
+                  onClick={() => setCategory(cat.id)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-body font-medium whitespace-nowrap transition-all duration-200 cursor-pointer border tracking-wide ${
+                    isSelected
+                      ? "bg-brand text-brand-foreground border-brand shadow-sm scale-[1.02]"
+                      : "bg-background text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                >
+                  {cat.nameCat}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </header>

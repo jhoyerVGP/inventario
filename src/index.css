@@ -22,12 +22,16 @@
 
   /* === COLORES SEMÁNTICOS (shadcn/ui) === */
   /* Backgrounds */
-  --background: oklch(1 0 0); /* Blanco puro */
-  --background-view: oklch(97% 0 0); /* Gris muy sutil para el body */
-  --foreground: oklch(0.129 0.042 264.695); /* Texto principal body */
+  --background: oklch(1 0 0);
+  /* Blanco puro */
+  --background-view: oklch(97% 0 0);
+  /* Gris muy sutil para el body */
+  --foreground: oklch(0.129 0.042 264.695);
+  /* Texto principal body */
 
   /* Cards & Surfaces */
-  --card: oklch(1 0 0); /* Cards en blanco puro */
+  --card: oklch(1 0 0);
+  /* Cards en blanco puro */
   --card-foreground: oklch(0.129 0.042 264.695);
 
   /* Popover */
@@ -57,59 +61,66 @@
   /* Borders & Inputs */
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788); /* Focus rings */
+  --ring: oklch(0.704 0.04 256.788);
+  /* Focus rings */
 
   /* === COLORES PERSONALIZADOS === */
   /* === COLORES ESPECÍFICOS PARA BOTONES === */
   /* Botón de Generar Recibo */
-  --btn-receipt: oklch(0.55 0.22 285); /* Morado principal */
+  --btn-receipt: oklch(0.55 0.22 285);
+  /* Morado principal */
   --btn-receipt-hover: oklch(0.48 0.24 285);
   --btn-receipt-foreground: oklch(0.99 0.01 280);
 
   /* Botón de Procesar Venta */
-  --btn-process: oklch(0.58 0.15 165); /* Verde esmeralda */
+  --btn-process: oklch(0.58 0.15 165);
+  /* Verde esmeralda */
   --btn-process-hover: oklch(0.52 0.16 165);
   --btn-process-foreground: oklch(0.99 0.01 160);
 
   /* Botón de Guardar/Confirmar */
-  --btn-confirm: oklch(0.25 0.06 265); /* Navy */
+  --btn-confirm: oklch(0.25 0.06 265);
+  /* Navy */
   --btn-confirm-hover: oklch(0.22 0.07 265);
   --btn-confirm-foreground: oklch(0.99 0.01 260);
 
   /* Botón de Cancelar/Eliminar */
-  --btn-cancel: oklch(0.56 0.22 25); /* Rojo */
+  --btn-cancel: oklch(0.56 0.22 25);
+  /* Rojo */
   --btn-cancel-hover: oklch(0.5 0.24 25);
   --btn-cancel-foreground: oklch(0.99 0.01 20);
 
   /* Botón Premium/Especial */
-  --btn-premium: linear-gradient(
-    135deg,
-    oklch(0.55 0.22 285) 0%,
-    oklch(0.6 0.2 250) 100%
-  );
-  --btn-premium-hover: linear-gradient(
-    135deg,
-    oklch(0.48 0.24 285) 0%,
-    oklch(0.54 0.22 250) 100%
-  );
+  --btn-premium: linear-gradient(135deg,
+      oklch(0.55 0.22 285) 0%,
+      oklch(0.6 0.2 250) 100%);
+  --btn-premium-hover: linear-gradient(135deg,
+      oklch(0.48 0.24 285) 0%,
+      oklch(0.54 0.22 250) 100%);
   --btn-premium-foreground: oklch(0.99 0.01 280);
 
   /* Brand (Tu violeta corporativo) */
   --brand: oklch(0.623 0.214 263.99);
   --brand-foreground: oklch(1 0 0);
   /* Brand Hover - Versión más oscura (si prefieres ese efecto) */
-  --brand-hover-dark: oklch(0.523 0.214 263.99); /* -0.1 en luminosidad */
+  --brand-hover-dark: oklch(0.523 0.214 263.99);
+  /* -0.1 en luminosidad */
 
   /* Card Highlight (Cards especiales/premium) */
   --card-highlight: oklch(0.97 0.01 265.75);
   --card-highlight-foreground: oklch(0.208 0.042 265.755);
 
   /* === COLORES DE GRÁFICAS (Recharts) === */
-  --chart-1: oklch(0.646 0.222 41.116); /* Naranja */
-  --chart-2: oklch(0.6 0.118 184.704); /* Cyan */
-  --chart-3: oklch(0.398 0.07 227.392); /* Azul oscuro */
-  --chart-4: oklch(0.828 0.189 84.429); /* Verde lima */
-  --chart-5: oklch(0.769 0.188 70.08); /* Amarillo */
+  --chart-1: oklch(0.646 0.222 41.116);
+  /* Naranja */
+  --chart-2: oklch(0.6 0.118 184.704);
+  /* Cyan */
+  --chart-3: oklch(0.398 0.07 227.392);
+  /* Azul oscuro */
+  --chart-4: oklch(0.828 0.189 84.429);
+  /* Verde lima */
+  --chart-5: oklch(0.769 0.188 70.08);
+  /* Amarillo */
 
   /* === SIDEBAR === */
   --sidebar: oklch(0.984 0.003 247.858);
@@ -124,12 +135,15 @@
 
 .dark {
   /* === BACKGROUNDS === */
-  --background: oklch(0.129 0.042 264.695); /* Azul muy oscuro */
+  --background: oklch(0.129 0.042 264.695);
+  /* Azul muy oscuro */
   --background-view: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858); /* Texto claro */
+  --foreground: oklch(0.984 0.003 247.858);
+  /* Texto claro */
 
   /* === CARDS === */
-  --card: oklch(0.18 0.042 264.695); /* Un poco más claro que el fondo */
+  --card: oklch(0.18 0.042 264.695);
+  /* Un poco más claro que el fondo */
   --card-foreground: oklch(0.984 0.003 247.858);
 
   /* === POPOVER === */
@@ -137,7 +151,8 @@
   --popover-foreground: oklch(0.984 0.003 247.858);
 
   /* === PRIMARY === */
-  --primary: oklch(0.929 0.013 255.508); /* Invertido en dark */
+  --primary: oklch(0.929 0.013 255.508);
+  /* Invertido en dark */
   --primary-foreground: oklch(0.208 0.042 265.755);
 
   /* === SECONDARY === */
@@ -179,19 +194,16 @@
   --btn-cancel-hover: oklch(0.68 0.25 25);
   --btn-cancel-foreground: oklch(0.96 0.01 20);
 
-  --btn-premium: linear-gradient(
-    135deg,
-    oklch(0.65 0.24 285) 0%,
-    oklch(0.7 0.22 250) 100%
-  );
-  --btn-premium-hover: linear-gradient(
-    135deg,
-    oklch(0.7 0.26 285) 0%,
-    oklch(0.75 0.24 250) 100%
-  );
+  --btn-premium: linear-gradient(135deg,
+      oklch(0.65 0.24 285) 0%,
+      oklch(0.7 0.22 250) 100%);
+  --btn-premium-hover: linear-gradient(135deg,
+      oklch(0.7 0.26 285) 0%,
+      oklch(0.75 0.24 250) 100%);
   --btn-premium-foreground: oklch(0.12 0.02 270);
 
-  --brand: oklch(0.623 0.214 263.99); /* Mismo violeta */
+  --brand: oklch(0.623 0.214 263.99);
+  /* Mismo violeta */
   --brand-foreground: oklch(1 0 0);
 
   --card-highlight: oklch(0.25 0.042 265.75);
@@ -343,6 +355,7 @@
 }
 
 @layer components {
+
   /* Tabla de datos — estilos compartidos (light/dark vía tokens) */
   .data-table-shell {
     @apply flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-border bg-card font-body shadow-sm;
@@ -384,7 +397,8 @@
   }
 
   .form-table-scroll {
-    @apply w-full max-h-[min(50vh,28rem)] overflow-auto;
+    @apply w-full overflow-auto;
+    max-height: min(50vh, 28rem);
     -webkit-overflow-scrolling: touch;
   }
 
@@ -418,14 +432,14 @@
     @apply border-t border-border bg-card;
   }
 
-  /* Tabla en modales (detalle compra, etc.) */
   .modal-table-wrap {
-    @apply min-w-0 overflow-hidden rounded-xl border border-border bg-card;
+    @apply min-w-0 rounded-xl border border-border bg-card;
+    overflow: clip;
   }
 
-  /* Scroll X en móvil; scroll Y si hay muchas filas; en desktop sin min-width forzado */
   .modal-table-scroll {
-    @apply w-full max-h-[min(38vh,18rem)] overflow-auto sm:max-h-[min(44vh,22rem)];
+    @apply w-full overflow-auto sm:overflow-x-visible;
+    max-height: min(38vh, 18rem);
     -webkit-overflow-scrolling: touch;
   }
 

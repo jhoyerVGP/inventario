@@ -36,7 +36,7 @@ export function PurchaseModals({ purchaseId, onClose }: Props) {
     <Dialog open={!!purchaseId} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         className={cn(
-          "flex w-[calc(100vw-1rem)] max-w-[min(56rem,calc(100vw-1rem))] flex-col gap-0 overflow-hidden p-0",
+          "flex w-[calc(100vw-1rem)] max-w-[min(72rem,calc(100vw-1rem))] flex-col gap-0 overflow-hidden p-0",
           "max-h-[min(90dvh,44rem)] border-border bg-card font-body shadow-xl",
           "sm:w-auto sm:min-w-[min(100%,28rem)]",
         )}

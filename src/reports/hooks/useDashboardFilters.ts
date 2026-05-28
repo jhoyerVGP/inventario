@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { format, subDays, startOfMonth, subMonths } from "date-fns";
-import type { DashboardFilters, DateRangePreset } from "../types/filters.types";
+import type { DateRangePreset } from "../types/filters.types";
 
 const today = () => format(new Date(), "yyyy-MM-dd");
 

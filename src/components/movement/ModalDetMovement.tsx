@@ -1,7 +1,6 @@
 import { type Movement } from "@/types/movement";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { getBranchName } from "@/utils/movement";
-import type { JSX } from "react";
 import { formatDate } from "@/utils/dataFormat";
 
 interface MovementDialogProps {

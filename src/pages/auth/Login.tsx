@@ -1,7 +1,6 @@
 import FormLogin from "../../components/loginComp/FormLogin";
 import { useLogin } from "../../hooks/auth/useLogin";
 import type { loginCredentials } from "@/schemes/auth";
-import { VerifyCredencials } from "../../components/loginComp/VerifyCredencials";
 import { LucideAlertCircle } from "lucide-react";
 
 const LoginCard = () => {

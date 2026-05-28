@@ -1,25 +1,21 @@
 import { useState } from "react";
-import { Camera, Mail, User, Shield, Phone } from "lucide-react";
+import { Camera, Mail, User, Shield, Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { FormChangePass } from "@/components/profile/FormChangePass";
-//importamos el context de auth
 import { useAuth } from "@/context/AuthContext";
-//hook para el cambio de password
 import { useChangePassword } from "@/hooks/auth/useChangePassword";
-//hook para el cambio de avatar
 import { useUpdateAvatar } from "@/hooks/profile/useUpdateAvatar";
 import { toast } from "sonner";
 import type { PasswordChange } from "@/schemes/profile";
 
 const Profile = () => {
-  //usames el context de auth
   const { user } = useAuth();
-  //estados para el avatar
   const [preview, setPreview] = useState(user?.avatar);
   const [file, setFile] = useState<File | null>(null);
-  //logica del cambio de avatar
+
   const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const img = e.target.files?.[0];
     if (!img) return;
@@ -32,7 +28,7 @@ const Profile = () => {
     }
     const MAX_SIZE = 2 * 1024 * 1024;
     if (img.size > MAX_SIZE) {
-      toast.error("La imagen es muy pesada", {
+      toast.error("La imagen es muy pesada (máx 2MB)", {
         position: "top-center",
         duration: 4000,
       });
@@ -41,9 +37,9 @@ const Profile = () => {
     setFile(img);
     setPreview(URL.createObjectURL(img));
   };
-  //usamos el hook para actualizar el avatar
+
   const updateAvatarMutation = useUpdateAvatar();
-  //funcion para manejar el submit del avatar
+
   const handleAvatarSubmit = () => {
     if (!file || !user) return;
     const promise = updateAvatarMutation.mutateAsync({ file, userId: user.id });
@@ -56,7 +52,6 @@ const Profile = () => {
     });
   };
 
-  //logica del camvio de password
   const changePasswordMutation = useChangePassword();
   const handleCP = (data: PasswordChange) => {
     const promise = changePasswordMutation.mutateAsync({
@@ -74,33 +69,39 @@ const Profile = () => {
   };
 
   return (
-    // min-h-screen asegura que el fondo cubra todo aunque el contenido sea poco
-    <div className="bg-background-view p-4 md:px-8 md:py-2 flex flex-col items-center h-full overflow-y-auto">
-      {/* CONTENEDOR PRINCIPAL: Max-width para que no se estire infinito en monitores 4K */}
-      <div className="w-full max-w-4xl bg-card rounded-xl shadow-sm border border-border ">
-        {/* GRID RESPONSIVE: 1 columna en móvil, 2 columnas en escritorio (lg) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2">
-          {/* ================= SECCIÓN AVATAR (Izquierda/Arriba) ================= */}
-          <div className="p-8 md:p-12 flex flex-col items-center justify-center bg-ring/10 lg:border-b-0 lg:border-r border-border">
+    <div className="bg-background/40 p-4 md:p-8 flex flex-col items-center gap-6 h-full overflow-y-auto w-full">
+      {/* CONTENEDOR PRINCIPAL */}
+      <div className="w-full max-w-4xl bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+        {/* GRID RESPONSIVE */}
+        <div className="grid grid-cols-1 lg:grid-cols-12">
+          {/* ================= SECCIÓN AVATAR (Izquierda - Ocupa 5/12 cols) ================= */}
+          <div className="lg:col-span-5 p-8 md:p-12 flex flex-col items-center justify-center bg-muted/20 dark:bg-muted/10 border-b lg:border-b-0 lg:border-r border-border/60">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-card-foreground">
-                Perfil de usuario
+              <h2 className="text-xl font-bold font-title text-foreground tracking-tight">
+                Perfil de Usuario
               </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Gestiona tu identidad en la plataforma
+              </p>
             </div>
+
+            {/* Contenedor del Avatar Refinado */}
             <div className="relative group">
-              <div className="w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-ring shadow-2xl">
+              <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-background shadow-xl ring-1 ring-border/80 transition-all duration-300 group-hover:ring-primary/40">
                 <img
                   src={
                     !preview
                       ? "https://i.pinimg.com/736x/56/fa/35/56fa35ecb5b0417a563b2dbe0fdbef7b.jpg"
                       : preview
                   }
-                  className="w-full h-full object-cover"
-                  alt="Profile"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  alt="Profile picture"
                 />
               </div>
-              <label className="absolute bottom-2 right-2 bg-primary p-3 rounded-full cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-card">
-                <Camera className="w-5 h-5 text-primary-foreground" />
+
+              {/* Botón flotante estilizado */}
+              <label className="absolute bottom-1 right-1 bg-primary text-primary-foreground p-2.5 rounded-full cursor-pointer hover:scale-105 transition-all shadow-md border-2 border-background">
+                <Camera className="w-4 h-4" />
                 <input
                   type="file"
                   accept="image/*"
@@ -114,65 +115,80 @@ const Profile = () => {
               <Button
                 onClick={handleAvatarSubmit}
                 size="sm"
-                className="mt-4 w-full max-w-[150px] bg-primary rounded-full cursor-pointer"
+                disabled={updateAvatarMutation.isPending}
+                className="mt-6 w-full max-w-[140px] rounded-full shadow-sm font-semibold text-xs"
               >
-                Guardar foto
+                {updateAvatarMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  "Guardar cambios"
+                )}
               </Button>
             )}
           </div>
 
-          {/* ================= SECCIÓN FORMULARIO (Derecha/Abajo) ================= */}
-          <div className="p-8 md:p-12 my-auto">
-            <div className="space-y-7">
-              {/* Input Nombre */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <User size={16} />
-                  <Label className="font-bold text-card-foreground">
-                    Nombre
+          {/* ================= SECCIÓN FORMULARIO / DETALLES (Derecha - Ocupa 7/12 cols) ================= */}
+          <div className="lg:col-span-7 p-8 md:p-12 flex flex-col justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+              {/* Campo Nombre */}
+              <div className="space-y-1.5 md:col-span-2">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <User size={14} className="text-muted-foreground/80" />
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Nombre Completo
                   </Label>
                 </div>
-                <span className="border-none focus-visible:ring-0 text-card-foreground">
-                  {user?.name}
-                </span>
+                <div className="p-3 bg-muted/30 rounded-xl border border-border/50 text-sm font-semibold text-foreground">
+                  {user?.name || "No especificado"}
+                </div>
               </div>
 
-              {/* Input Email */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Mail size={16} />
-                  <Label className="font-bold text-card-foreground">
-                    Email
+              {/* Campo Email */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Mail size={14} className="text-muted-foreground/80" />
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Correo Electrónico
                   </Label>
                 </div>
-                <span className="border-none focus-visible:ring-0 text-card-foreground">
+                <div className="p-3 bg-muted/30 rounded-xl border border-border/50 text-sm font-medium text-foreground truncate">
                   {user?.email}
-                </span>
+                </div>
               </div>
 
-              {/* Input Teléfono */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone size={16} />
-                  <Label className="font-bold text-card-foreground">
-                    Teléfono
+              {/* Campo Teléfono */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Phone size={14} className="text-muted-foreground/80" />
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Teléfono / Celular
                   </Label>
                 </div>
-                <span className="border-none focus-visible:ring-0 text-card-foreground">
-                  {!user?.phone ? "sin teléfono" : user?.phone}
-                </span>
+                <div className="p-3 bg-muted/30 rounded-xl border border-border/50 text-sm font-semibold text-foreground">
+                  {user?.phone || (
+                    <span className="text-muted-foreground/60 font-normal italic text-xs">
+                      Sin registrar
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Input Rol */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Shield size={16} />
-                  <Label className="font-bold text-card-foreground">
-                    Rol del usuario
+              {/* Campo Rol (Badge Premium Adaptativo) */}
+              <div className="space-y-1.5 md:col-span-2 pt-2">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Shield size={14} className="text-muted-foreground/80" />
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Privilegios asignados
                   </Label>
                 </div>
-                <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold font-body uppercase tracking-wider">
-                  {user?.role}
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20 dark:bg-primary/15 tracking-wide uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    {user?.role || "Usuario"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -180,8 +196,8 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Componente de cambio de password debajo */}
-      <div className="w-full max-w-4xl">
+      {/* COMPONENTE DE CAMBIO DE CONTRASEÑA */}
+      <div className="w-full max-w-4xl mt-2">
         <FormChangePass funParent={handleCP} />
       </div>
     </div>

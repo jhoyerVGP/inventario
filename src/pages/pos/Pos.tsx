@@ -105,7 +105,7 @@ const Pos = () => {
   }
 
   return (
-    <div className="flex h-full w-full bg-background-view">
+    <div className="flex h-full w-full bg-background">
       {/* PANEL IZQUIERDO: CATÁLOGO */}
       <section className="flex-1 h-full flex flex-col min-w-0 relative overflow-y-auto w-full">
         {/* buscador + categorias */}

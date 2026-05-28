@@ -65,6 +65,7 @@ export default function CreatePurchase() {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<PurchaseFormValues>({
     resolver: zodResolver(purchaseSchema),
@@ -88,28 +89,30 @@ export default function CreatePurchase() {
   const isReadOnly = isEditMode && purchaseData?.status === "CONFIRMED";
   const isDraft = !isEditMode || purchaseData?.status === "DRAFT";
 
-  const { data: products = [] } = useGetProductsForPurchase(
-    watchedBranchId || null,
+  const { data: products = [], isLoading: isProductsLoading } = useGetProductsForPurchase(
+    watchedBranchId || (isEditMode ? purchaseData?.branchid : null) || null,
   );
 
   const [productOpen, setProductOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (!purchaseData || isInitialized) return;
+    if (!isEditMode) {
+      setIsInitialized(true);
+      return;
+    }
+
+    if (isSuppliersLoading || isBranchesLoading || isPurchaseLoading || isInitialized) return;
+    if (!purchaseData) return;
 
     const branchId = purchaseData.branchid ?? "";
     const supplierId = purchaseData.supplierid ?? "";
 
-    if (supplierId) setValue("supplierid", supplierId);
-    if (branchId) setValue("branchid", branchId);
-    setValue("status", purchaseData.status);
-    setValue("notes", purchaseData.notes ?? "");
+    if (branchId && purchaseData.purchasedetails?.length > 0) {
+      if (isProductsLoading || products.length === 0) return;
+    }
 
-    if (branchId && watchedBranchId !== branchId) return;
-    if (branchId && products.length === 0 && purchaseData.purchasedetails.length) return;
-
-    const rows = purchaseData.purchasedetails.map((d) => {
+    const rows = (purchaseData.purchasedetails || []).map((d: any) => {
       const prod = products.find((p: any) => p.id === d.productid);
       return {
         productId: d.productid,
@@ -120,13 +123,24 @@ export default function CreatePurchase() {
       };
     });
 
-    setValue("rows", rows);
+    reset({
+      supplierid: supplierId,
+      branchid: branchId,
+      status: purchaseData.status ?? "DRAFT",
+      notes: purchaseData.notes ?? "",
+      rows: rows,
+    });
+
     setIsInitialized(true);
   }, [
+    isEditMode,
+    isSuppliersLoading,
+    isBranchesLoading,
+    isPurchaseLoading,
+    isProductsLoading,
     purchaseData,
     products,
-    watchedBranchId,
-    setValue,
+    reset,
     isInitialized,
   ]);
 
@@ -162,9 +176,9 @@ export default function CreatePurchase() {
     const promise = isEditMode
       ? updatePurchase.mutateAsync({ id: id!, formValues: values })
       : createPurchase.mutateAsync({
-          formValues: values,
-          userId: user!.id,
-        });
+        formValues: values,
+        userId: user!.id,
+      });
 
     toast.promise(promise, {
       loading: isEditMode ? "Actualizando compra..." : "Registrando compra...",
@@ -207,7 +221,7 @@ export default function CreatePurchase() {
   }
 
   return (
-    <div className="min-h-full w-full bg-background-view font-body">
+    <div className="min-h-full w-full bg-background font-body">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4">
         {/* Header */}
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -409,137 +423,137 @@ export default function CreatePurchase() {
             )}
 
             <div className="form-table-scroll">
-            <table className="form-table">
-              <thead className="form-table-head">
-                <tr>
-                  <th className="form-table-th min-w-[10rem] text-left">
-                    Producto
-                  </th>
-                  <th className="form-table-th w-24 text-right whitespace-nowrap">
-                    Stock actual
-                  </th>
-                  <th className="form-table-th w-28 text-right whitespace-nowrap">
-                    Cantidad
-                  </th>
-                  <th className="form-table-th w-32 text-right whitespace-nowrap">
-                    Costo unitario
-                  </th>
-                  <th className="form-table-th w-28 text-right whitespace-nowrap">
-                    Subtotal
-                  </th>
-                  <th className="form-table-th w-12" />
-                </tr>
-              </thead>
-              <tbody>
-                {fields.length === 0 && (
+              <table className="form-table">
+                <thead className="form-table-head">
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="form-table-td py-10 text-center text-muted-foreground"
-                    >
-                      {watchedBranchId
-                        ? "Agrega productos usando el botón de arriba"
-                        : "Primero selecciona una sucursal"}
-                    </td>
+                    <th className="form-table-th min-w-[10rem] text-left">
+                      Producto
+                    </th>
+                    <th className="form-table-th w-24 text-right whitespace-nowrap">
+                      Stock actual
+                    </th>
+                    <th className="form-table-th w-28 text-right whitespace-nowrap">
+                      Cantidad
+                    </th>
+                    <th className="form-table-th w-32 text-right whitespace-nowrap">
+                      Costo unitario
+                    </th>
+                    <th className="form-table-th w-28 text-right whitespace-nowrap">
+                      Subtotal
+                    </th>
+                    <th className="form-table-th w-12" />
                   </tr>
-                )}
-                {fields.map((field, index) => {
-                  const qty = watchedRows[index]?.quantity || 0;
-                  const cost = watchedRows[index]?.unitCost || 0;
-                  const subtotal = qty * cost;
-
-                  return (
-                    <tr key={field.id} className="form-table-row">
-                      {/* Nombre */}
-                      <td className="form-table-td">
-                        <span className="font-medium text-card-foreground">
-                          {field.productName}
-                        </span>
-                      </td>
-
-                      {/* Stock actual */}
-                      <td className="form-table-td text-right text-muted-foreground">
-                        {field.currentStock}
-                      </td>
-
-                      {/* Cantidad */}
-                      <td className="form-table-td text-right">
-                        <Input
-                          type="number"
-                          min={1}
-                          className="w-20 text-right ml-auto"
-                          disabled={isReadOnly}
-                          {...register(`rows.${index}.quantity`, {
-                            valueAsNumber: true,
-                          })}
-                        />
-                        {errors.rows?.[index]?.quantity && (
-                          <p className="text-destructive text-xs text-right">
-                            {errors.rows[index]?.quantity?.message}
-                          </p>
-                        )}
-                      </td>
-
-                      {/* Costo unitario */}
-                      <td className="form-table-td text-right">
-                        <Input
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          className="w-24 text-right ml-auto"
-                          disabled={isReadOnly}
-                          {...register(`rows.${index}.unitCost`, {
-                            valueAsNumber: true,
-                          })}
-                        />
-                        {errors.rows?.[index]?.unitCost && (
-                          <p className="text-destructive text-xs text-right">
-                            {errors.rows[index]?.unitCost?.message}
-                          </p>
-                        )}
-                      </td>
-
-                      {/* Subtotal */}
-                      <td className="form-table-td text-right font-medium text-card-foreground">
-                        Bs. {subtotal.toFixed(2)}
-                      </td>
-
-                      {/* Eliminar */}
-                      <td className="form-table-td text-center">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="text-muted-foreground hover:text-destructive"
-                          onClick={() => remove(index)}
-                          disabled={isReadOnly}
-                        >
-                          <Trash2 size={15} />
-                        </Button>
+                </thead>
+                <tbody>
+                  {fields.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="form-table-td py-10 text-center text-muted-foreground"
+                      >
+                        {watchedBranchId
+                          ? "Agrega productos usando el botón de arriba"
+                          : "Primero selecciona una sucursal"}
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
+                  )}
+                  {fields.map((field, index) => {
+                    const qty = watchedRows[index]?.quantity || 0;
+                    const cost = watchedRows[index]?.unitCost || 0;
+                    const subtotal = qty * cost;
 
-              {/* Footer con total */}
-              {fields.length > 0 && (
-                <tfoot className="form-table-foot">
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="form-table-td py-3 text-right text-sm font-semibold text-card-foreground"
-                    >
-                      Total
-                    </td>
-                    <td className="form-table-td py-3 text-right text-sm font-semibold text-card-foreground">
-                      Bs. {grandTotal.toFixed(2)}
-                    </td>
-                    <td />
-                  </tr>
-                </tfoot>
-              )}
-            </table>
+                    return (
+                      <tr key={field.id} className="form-table-row">
+                        {/* Nombre */}
+                        <td className="form-table-td">
+                          <span className="font-medium text-card-foreground">
+                            {field.productName}
+                          </span>
+                        </td>
+
+                        {/* Stock actual */}
+                        <td className="form-table-td text-right text-muted-foreground">
+                          {field.currentStock}
+                        </td>
+
+                        {/* Cantidad */}
+                        <td className="form-table-td text-right">
+                          <Input
+                            type="number"
+                            min={1}
+                            className="w-20 text-right ml-auto"
+                            disabled={isReadOnly}
+                            {...register(`rows.${index}.quantity`, {
+                              valueAsNumber: true,
+                            })}
+                          />
+                          {errors.rows?.[index]?.quantity && (
+                            <p className="text-destructive text-xs text-right">
+                              {errors.rows[index]?.quantity?.message}
+                            </p>
+                          )}
+                        </td>
+
+                        {/* Costo unitario */}
+                        <td className="form-table-td text-right">
+                          <Input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            className="w-24 text-right ml-auto"
+                            disabled={isReadOnly}
+                            {...register(`rows.${index}.unitCost`, {
+                              valueAsNumber: true,
+                            })}
+                          />
+                          {errors.rows?.[index]?.unitCost && (
+                            <p className="text-destructive text-xs text-right">
+                              {errors.rows[index]?.unitCost?.message}
+                            </p>
+                          )}
+                        </td>
+
+                        {/* Subtotal */}
+                        <td className="form-table-td text-right font-medium text-card-foreground">
+                          Bs. {subtotal.toFixed(2)}
+                        </td>
+
+                        {/* Eliminar */}
+                        <td className="form-table-td text-center">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="text-muted-foreground hover:text-destructive"
+                            onClick={() => remove(index)}
+                            disabled={isReadOnly}
+                          >
+                            <Trash2 size={15} />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+
+                {/* Footer con total */}
+                {fields.length > 0 && (
+                  <tfoot className="form-table-foot">
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="form-table-td py-3 text-right text-sm font-semibold text-card-foreground"
+                      >
+                        Total
+                      </td>
+                      <td className="form-table-td py-3 text-right text-sm font-semibold text-card-foreground">
+                        Bs. {grandTotal.toFixed(2)}
+                      </td>
+                      <td />
+                    </tr>
+                  </tfoot>
+                )}
+              </table>
             </div>
           </div>
 
@@ -561,7 +575,6 @@ export default function CreatePurchase() {
                   updatePurchase.isPending ||
                   confirmPurchase.isPending
                 }
-                className="btn-create w-full sm:w-auto"
               >
                 {createPurchase.isPending || updatePurchase.isPending
                   ? isEditMode
@@ -581,7 +594,6 @@ export default function CreatePurchase() {
                   confirmPurchase.isPending ||
                   createPurchase.isPending
                 }
-                className="btn-create w-full sm:w-auto"
               >
                 {confirmPurchase.isPending ? "Confirmando..." : "Confirmar Compra"}
               </Button>

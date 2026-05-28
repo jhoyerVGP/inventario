@@ -16,21 +16,21 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    // Solo en el cliente (evitar problemas con SSR)
+    //Solo en el cliente (evitar problemas con SSR)
     if (typeof window === "undefined") return "light";
 
-    // 1. Intentar obtener del localStorage
+    //Intentar obtener del localStorage
     const saved = localStorage.getItem("theme");
     if (saved === "dark" || saved === "light") {
       return saved;
     }
 
-    // 2. Usar preferencia del sistema
+    //Usar preferencia del sistema
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       return "dark";
     }
 
-    // 3. Por defecto, modo claro
+    //Por defecto, modo claro
     return "light";
   });
 

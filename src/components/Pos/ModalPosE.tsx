@@ -5,7 +5,6 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -13,11 +12,11 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-//types para el pos y la venta
 import type { CartItem, Totals } from "@/types/salePos";
 import { saleFormSchema, type SaleFormValues } from "@/schemes/saleExecute";
 import { FormSecFinancial } from "./FormSecFinancial";
 import { FormSecStateSale } from "./FormSecStateSale";
+import { CreditCard } from "lucide-react";
 
 interface Props {
   isOpen: boolean;
@@ -50,7 +49,6 @@ export function ModalPosE({
 
   const isGeneric = methods.watch("isGeneric");
 
-  // sincroniza venta rápida
   useEffect(() => {
     if (isGeneric) {
       methods.setValue("name", "S/N");
@@ -61,17 +59,16 @@ export function ModalPosE({
     }
   }, [isGeneric, methods.setValue]);
 
-  //setea los totales cuando cambian
   useEffect(() => {
     methods.setValue("totalReal", Number(totals.calculatedTotal.toFixed(2)));
     methods.setValue("totalCobrado", Number(totals.calculatedTotal.toFixed(2)));
-  }, [totals.calculatedTotal]);
+  }, [totals.calculatedTotal, methods.setValue]);
 
   useEffect(() => {
     if (carts.length === 0) {
       methods.reset();
     }
-  }, [carts]);
+  }, [carts, methods.reset]);
 
   const onSubmit = (data: SaleFormValues) => {
     executeSale(carts, data);
@@ -83,38 +80,81 @@ export function ModalPosE({
     <FormProvider {...methods}>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
-          className="card-modal px-1 pb-3
-          sm:max-w-[520px] sm:px-4
-          md:max-w-[720px]"
+          className="bg-card border border-border rounded-2xl shadow-2xl gap-0 max-w-[calc(100%-1.5rem)] max-h-[92vh] flex flex-col p-0 overflow-hidden select-none
+            sm:max-w-[540px] 
+            md:max-w-[800px]"
         >
-          <DialogHeader className="shrink-0">
-            <DialogTitle className="text-xl font-bold">
-              Procesar Pago
-            </DialogTitle>
-            <DialogDescription>
-              Confirma los datos para cerrar la venta.
-            </DialogDescription>
+          {/* Cabecera Ejecutiva */}
+          <DialogHeader className="p-4 md:p-5 border-b border-border bg-card shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-brand/10 text-brand rounded-xl border border-brand/10 shrink-0">
+                <CreditCard size={18} strokeWidth={2.5} />
+              </div>
+              <div className="text-left">
+                <DialogTitle className="text-base font-title font-bold text-foreground tracking-tight">
+                  Finalizar Operación de Venta
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  Establece el método de pago y la asignación fiscal del
+                  comprobante.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
+
+          {/* Formulario Estructurado */}
           <form
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col flex-1"
+            className="flex flex-col flex-1 min-h-0 bg-background-view/5"
           >
-            <div className="flex flex-col gap-2 py-2 w-full">
-              {/* seccion financiera */}
-              <FormSecFinancial />
-              {/* seccion datos cliente */}
-              <FormSecStateSale isGeneric={isGeneric} />
+            <div className="flex-1 overflow-y-auto p-4 md:p-5 custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                {/* Bloque Izquierdo: Finanzas */}
+                <div className="bg-card/50 border border-border/70 p-4 rounded-xl shadow-xs space-y-3">
+                  <div className="flex items-center gap-1.5 border-b border-border/60 pb-2 mb-1">
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                      01
+                    </span>
+                    <h3 className="text-xs font-title font-bold text-foreground/90 uppercase tracking-wider">
+                      Gestión de Liquidación
+                    </h3>
+                  </div>
+                  <FormSecFinancial />
+                </div>
+
+                {/* Bloque Derecho: Fiscal/Cliente */}
+                <div className="bg-card/50 border border-border/70 p-4 rounded-xl shadow-xs space-y-3">
+                  <div className="flex items-center gap-1.5 border-b border-border/60 pb-2 mb-1">
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                      02
+                    </span>
+                    <h3 className="text-xs font-title font-bold text-foreground/90 uppercase tracking-wider">
+                      Cliente & Comprobante
+                    </h3>
+                  </div>
+                  <FormSecStateSale isGeneric={isGeneric} />
+                </div>
+              </div>
             </div>
-            <DialogFooter className="mt-3">
+
+            {/* Acciones del Sistema */}
+            <div className="p-4 border-t border-border bg-card shrink-0 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
               <DialogClose asChild>
-                <Button variant="secondary" type="button">
-                  Cancelar
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full sm:w-auto px-4 h-9 text-xs font-title font-semibold border-border hover:bg-muted active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  Volver al POS
                 </Button>
               </DialogClose>
-              <Button type="submit" className="btn-create">
+              <Button
+                type="submit"
+                className="w-full sm:w-auto px-5 h-9 text-xs font-title font-bold bg-brand text-brand-foreground hover:bg-brand-hover-dark active:scale-[0.98] transition-all cursor-pointer shadow-sm border border-brand/10"
+              >
                 Confirmar y Cobrar
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

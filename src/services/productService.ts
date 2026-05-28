@@ -109,7 +109,7 @@ export const getProducts = async (
   if (error) {
     throw new Error(error.message);
   }
-  console.log("Productos obtenidos:", data);
+
   //Retorno de datos
   return {
     data: data || [],

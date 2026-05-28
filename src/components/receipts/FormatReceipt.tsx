@@ -4,171 +4,186 @@ import {
   View,
   Document,
   StyleSheet,
-  Svg,
-  Path,
   Font,
 } from "@react-pdf/renderer";
 import type { ReceiptData } from "@/types/receipt";
 
-// Opcional: Registrar una fuente bonita (Google Fonts)
-// Si no cargas esto, usará Helvetica por defecto.
+// Registro de fuente limpia y compacta para optimizar el espacio en tickets
 Font.register({
   family: "Inter",
   src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.ttf",
 });
 
-const themeColor = "#0369a1"; // Sky-700
-const lightGray = "#f1f5f9"; // Slate-100
-
+// Estilos optimizados para tiquetera térmica estándar de 80mm (226pt de ancho)
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Helvetica", // Cambiar a 'Inter' si registraste la fuente arriba
-    fontSize: 10,
-    paddingTop: 40,
-    paddingLeft: 40,
-    paddingRight: 40,
-    paddingBottom: 0, // Sin padding abajo para el footer
+    fontFamily: "Helvetica", // Cambiar a 'Inter' si se prefiere una fuente externa
+    fontSize: 9,
+    lineHeight: 1.2,
+    paddingTop: 12,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 15,
     flexDirection: "column",
     backgroundColor: "#ffffff",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
+  // Contenedor del Isotipo / Logo Simple texturizado
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 6,
   },
-  headerLeft: {
-    flexDirection: "column",
+  logoBox: {
+    borderWidth: 2,
+    borderColor: "#000000",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginBottom: 4,
   },
-  title: {
-    fontSize: 28,
-    fontFamily: "Helvetica-Bold", // O Inter-Bold
-    color: themeColor,
+  logoText: {
+    fontSize: 14,
+    fontFamily: "Helvetica-Bold",
+    letterSpacing: 2,
     textTransform: "uppercase",
   },
-  subtitle: {
-    fontSize: 10,
-    color: "#64748b",
-    marginTop: 4,
-  },
-  companyInfo: {
-    textAlign: "right",
-    fontSize: 9,
-    color: "#475569",
+  // Bloque de encabezado principal
+  companyHeader: {
+    alignItems: "center",
+    marginBottom: 10,
   },
   companyName: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Helvetica-Bold",
-    color: "#1e293b",
-    marginBottom: 2,
+    textTransform: "uppercase",
+    textAlign: "center",
   },
-  // La barra gris de información
-  infoBar: {
-    backgroundColor: lightGray,
-    borderRadius: 6,
-    padding: 12,
+  companyDetails: {
+    fontSize: 8,
+    color: "#333333",
+    textAlign: "center",
+    marginTop: 1,
+  },
+  // Divisores emulando el corte de tiquetera
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#000000",
+    borderStyle: "dashed",
+    marginVertical: 6,
+  },
+  thickDivider: {
+    borderBottomWidth: 1.5,
+    borderBottomColor: "#000000",
+    marginVertical: 6,
+  },
+  // Metadatos de la transacción
+  metaSection: {
+    marginBottom: 6,
+  },
+  metaRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
-    borderColor: "#e2e8f0",
-    borderWidth: 1,
-  },
-  infoCol: {
-    flexDirection: "column",
-  },
-  label: {
-    fontSize: 8,
-    textTransform: "uppercase",
-    color: "#64748b",
-    marginBottom: 4,
-    fontWeight: "bold",
-  },
-  value: {
-    fontSize: 10,
-    fontWeight: "bold",
-    color: "#1e293b",
-  },
-  // Cliente
-  clientSection: {
-    marginBottom: 20,
-    paddingLeft: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: themeColor,
-  },
-  clientName: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 8.5,
     marginBottom: 2,
   },
-  // Tabla
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: themeColor,
-    padding: 8,
-    color: "white",
+  metaLabel: {
+    color: "#555555",
+  },
+  metaValue: {
+    fontFamily: "Helvetica-Bold",
+  },
+  // Datos del Cliente
+  clientSection: {
+    marginVertical: 4,
+  },
+  clientTitle: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: "#444444",
+    marginBottom: 2,
+  },
+  clientText: {
     fontSize: 9,
-    fontWeight: "bold",
-    borderRadius: 4,
+    fontFamily: "Helvetica-Bold",
   },
-  tableRow: {
+  // Lista de Productos (Estructura compacta POS)
+  itemsHeader: {
     flexDirection: "row",
-    padding: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    paddingBottom: 4,
   },
-  colDesc: { width: "50%" },
-  colPrice: { width: "15%", textAlign: "center" },
-  colQty: { width: "15%", textAlign: "center" },
-  colTotal: { width: "20%", textAlign: "right" },
-
-  // Totales
-  footerSection: {
+  itemRow: {
+    flexDirection: "column",
+    marginBottom: 5,
+  },
+  itemMainLine: {
     flexDirection: "row",
-    marginTop: 20,
+    justifyContent: "space-between",
   },
-  notesArea: {
-    flex: 1,
-    paddingRight: 20,
+  itemName: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    width: "70%",
   },
-  totalsArea: {
-    width: 200,
+  itemTotal: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    textAlign: "right",
+    width: "30%",
+  },
+  itemSubDetails: {
+    flexDirection: "row",
+    fontSize: 8,
+    color: "#444444",
+    marginTop: 1,
+  },
+  // Bloque de Liquidación Financiera
+  totalsSection: {
+    alignItems: "flex-end",
+    marginTop: 4,
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 6,
-    color: "#475569",
+    width: "100%",
+    fontSize: 9,
+    marginBottom: 3,
   },
-  finalTotal: {
+  finalTotalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: themeColor,
-    color: "white",
-    padding: 8,
-    borderRadius: 4,
-    marginTop: 6,
+    width: "100%",
+    fontSize: 12,
+    fontFamily: "Helvetica-Bold",
+    borderTopWidth: 1,
+    borderTopColor: "#000000",
+    paddingTop: 4,
+    marginTop: 2,
+  },
+  debtRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    fontSize: 8.5,
+    color: "#000000",
+    fontFamily: "Helvetica-Bold",
+    marginTop: 3,
+  },
+  // Pie de página legal / promocional
+  footer: {
     alignItems: "center",
+    marginTop: 15,
   },
-  totalTextBig: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  // Decoración Footer
-  waveContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    justifyContent: "flex-end",
+  footerTitle: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 3,
+    textTransform: "uppercase",
   },
   footerText: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
+    fontSize: 7.5,
+    color: "#444444",
     textAlign: "center",
-    color: "#94a3b8",
-    fontSize: 9,
+    lineHeight: 1.3,
   },
 });
 
@@ -178,147 +193,155 @@ interface Props {
 
 export const FormatReceipt = ({ data }: Props) => (
   <Document>
-    <Page size="A4" style={styles.page}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.title}>Nota de Venta</Text>
-          <Text style={styles.subtitle}>
-            Documento no válido para crédito fiscal
-          </Text>
-        </View>
-        <View style={styles.companyInfo}>
-          <Text style={styles.companyName}>MI EMPRESA S.R.L.</Text>
-          <Text>Calle Comercio #123, Zona Central</Text>
-          <Text>La Paz, Bolivia</Text>
-          <Text>Tel: +591 600-12345</Text>
+    {/* Definimos un ancho fijo de 226pt (80mm) y un alto largo de 600pt. 
+      La tiquetera cortará el papel físicamente al terminar el contenido.
+    */}
+    <Page size={[226, 600]} style={styles.page}>
+      {/* ── 1. LOGO CORPORATIVO MINIMALISTA ── */}
+      <View style={styles.logoContainer}>
+        <View style={styles.logoBox}>
+          <Text style={styles.logoText}>Zero</Text>
         </View>
       </View>
 
-      {/* Info Bar */}
-      <View style={styles.infoBar}>
-        <View style={styles.infoCol}>
-          <Text style={styles.label}>FECHA</Text>
-          <Text style={styles.value}>
-            {new Date(data.created_at).toLocaleDateString("es-BO")}
-          </Text>
-        </View>
-        <View style={styles.infoCol}>
-          <Text style={styles.label}>NRO. RECIBO</Text>
-          <Text style={styles.value}>#{data.receiptNumber}</Text>
-        </View>
-        <View style={styles.infoCol}>
-          <Text style={styles.label}>SUCURSAL</Text>
-          <Text style={styles.value}>{data.branchName || "Principal"}</Text>
-        </View>
-        <View style={styles.infoCol}>
-          <Text style={styles.label}>VENDEDOR</Text>
-          <Text style={styles.value}>{data.userName || "Caja"}</Text>
-        </View>
-      </View>
-
-      {/* Cliente */}
-      <View style={styles.clientSection}>
-        <Text style={styles.label}>SEÑOR(ES):</Text>
-        <Text style={styles.clientName}>
-          {data.clientName || "Consumidor Final"}
+      {/* ── 2. DATOS DE LA EMPRESA ── */}
+      <View style={styles.companyHeader}>
+        <Text style={styles.companyName}>Mi Empresa S.R.L.</Text>
+        <Text style={styles.companyDetails}>
+          Calle Comercio #123, Zona Central
         </Text>
-        {data.clientNit && (
-          <Text style={{ fontSize: 10, color: "#475569" }}>
-            NIT / CI: {data.clientNit}
-          </Text>
-        )}
+        <Text style={styles.companyDetails}>La Paz - Bolivia</Text>
+        <Text style={styles.companyDetails}>Teléfono: +591 600-12345</Text>
+        <Text
+          style={[
+            styles.companyDetails,
+            { fontFamily: "Helvetica-Bold", marginTop: 4 },
+          ]}
+        >
+          NOTA DE VENTA
+        </Text>
+        <Text
+          style={[styles.companyDetails, { fontSize: 7, color: "#555555" }]}
+        >
+          Documento no válido para crédito fiscal
+        </Text>
       </View>
 
-      {/* Tabla Items */}
-      <View>
-        <View style={styles.tableHeader}>
-          <Text style={styles.colDesc}>DESCRIPCIÓN</Text>
-          <Text style={styles.colPrice}>PRECIO UNIT.</Text>
-          <Text style={styles.colQty}>CANT.</Text>
-          <Text style={styles.colTotal}>TOTAL</Text>
+      <View style={styles.divider} />
+
+      {/* ── 3. METADATOS DEL TICKET ── */}
+      <View style={styles.metaSection}>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Nro. Recibo:</Text>
+          <Text style={styles.metaValue}>#{data.receiptNumber}</Text>
         </View>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Fecha/Hora:</Text>
+          <Text style={styles.metaValue}>
+            {new Date(data.created_at).toLocaleDateString("es-BO")}{" "}
+            {new Date(data.created_at).toLocaleTimeString("es-BO", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+        </View>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Sucursal:</Text>
+          <Text style={styles.metaValue}>{data.branchName || "Centro"}</Text>
+        </View>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Atendido por:</Text>
+          <Text style={styles.metaValue}>{data.userName || "Cajero"}</Text>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
+
+      {/* ── 4. DATOS DEL CLIENTE ── */}
+      <View style={styles.clientSection}>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Cliente:</Text>
+          <Text style={styles.metaValue}>{data.clientName || "Consumidor Final"}</Text>
+        </View>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>NIT / CI:</Text>
+          <Text style={styles.metaValue}>{data.clientNit || "0"}</Text>
+        </View>
+      </View>
+
+      <View style={styles.thickDivider} />
+
+      {/* ── 5. LISTA DE ARTÍCULOS ── */}
+      <View style={{ flexGrow: 1 }}>
+        <View style={styles.itemsHeader}>
+          <Text style={{ width: "70%" }}>DESCRIPCIÓN</Text>
+          <Text style={{ width: "30%", textAlign: "right" }}>TOTAL</Text>
+        </View>
+        <View style={[styles.divider, { marginVertical: 2 }]} />
 
         {(data.items || []).map((item, index) => (
-          <View
-            key={index}
-            style={[
-              styles.tableRow,
-              { backgroundColor: index % 2 === 0 ? "#ffffff" : "#f8fafc" },
-            ]}
-          >
-            <Text style={styles.colDesc}>{item.name}</Text>
-            <Text style={styles.colPrice}>Bs. {item.unitPrice.toFixed(2)}</Text>
-            <Text style={styles.colQty}>{item.quantity}</Text>
-            <Text style={styles.colTotal}>
-              Bs. {(item.unitPrice * item.quantity).toFixed(2)}
-            </Text>
+          <View key={index} style={styles.itemRow}>
+            <div style={styles.itemMainLine}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <Text style={styles.itemTotal}>
+                Bs. {(item.unitPrice * item.quantity).toFixed(2)}
+              </Text>
+            </div>
+            {/* Detalles de cantidad y precio por debajo del nombre para evitar colisiones */}
+            <View style={styles.itemSubDetails}>
+              <Text>
+                {item.quantity} ud. x Bs. {item.unitPrice.toFixed(2)}
+              </Text>
+            </View>
           </View>
         ))}
       </View>
 
-      {/* Footer: Notas y Totales */}
-      <View style={styles.footerSection}>
-        <View style={styles.notesArea}>
-          <Text style={[styles.label, { marginBottom: 6 }]}>
-            TÉRMINOS Y CONDICIONES
-          </Text>
-          <Text
-            style={{
-              fontSize: 8,
-              color: "#64748b",
-              lineHeight: 1.5,
-              textAlign: "justify",
-            }}
-          >
-            Gracias por su preferencia. Verifique su producto antes de
-            retirarse. No se aceptan devoluciones pasadas las 24 horas. Forma de
-            pago: {data.paymentMethod}.
-          </Text>
+      <View style={styles.thickDivider} />
+
+      {/* ── 6. TOTALES Y LIQUIDACIÓN FINANCIERA ── */}
+      <View style={styles.totalsSection}>
+        <View style={styles.totalRow}>
+          <Text style={{ color: "#444444" }}>Subtotal:</Text>
+          <Text>Bs. {data.totalAmount.toFixed(2)}</Text>
         </View>
 
-        <View style={styles.totalsArea}>
+        {data.discountAmount! > 0 && (
           <View style={styles.totalRow}>
-            <Text>Subtotal</Text>
-            <Text>Bs. {data.totalAmount.toFixed(2)}</Text>
+            <Text style={{ color: "#444444" }}>Descuento:</Text>
+            <Text>-Bs. {data.discountAmount!.toFixed(2)}</Text>
           </View>
-          {data.discountAmount! > 0 && (
-            <View style={[styles.totalRow, { color: "#ef4444" }]}>
-              <Text>Descuento</Text>
-              <Text>- Bs. {data.discountAmount!.toFixed(2)}</Text>
-            </View>
-          )}
-          <View style={styles.finalTotal}>
-            <Text style={{ fontWeight: "bold" }}>TOTAL A PAGAR</Text>
-            <Text style={styles.totalTextBig}>
-              Bs. {data.finalAmount.toFixed(2)}
-            </Text>
-          </View>
-          {data.debtAmount! > 0 && (
-            <View style={{ marginTop: 5, alignItems: "flex-end" }}>
-              <Text style={{ fontSize: 9, color: "#ea580c" }}>
-                Saldo Pendiente: Bs. {data.debtAmount!.toFixed(2)}
-              </Text>
-            </View>
-          )}
+        )}
+
+        <View style={styles.finalTotalRow}>
+          <Text>TOTAL:</Text>
+          <Text>Bs. {data.finalAmount.toFixed(2)}</Text>
         </View>
+
+        {data.debtAmount! > 0 && (
+          <View style={styles.debtRow}>
+            <Text>SALDO PENDIENTE:</Text>
+            <Text>Bs. {data.debtAmount!.toFixed(2)}</Text>
+          </View>
+        )}
       </View>
 
-      {/* Decoración SVG (La onda genial al final) */}
-      <View fixed style={styles.waveContainer}>
-        <Svg
-          viewBox="0 0 1440 320"
-          width="600"
-          height="150"
-          style={{ color: "#f1f5f9" }}
-        >
-          <Path
-            fill="#f1f5f9"
-            d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          />
-        </Svg>
+      <View style={styles.divider} />
+
+      {/* ── 7. PIE DE PÁGINA (TÉRMINOS) ── */}
+      <View style={styles.footer}>
+        <Text style={styles.footerTitle}>¡Gracias por su compra!</Text>
         <Text style={styles.footerText}>
-          Gracias por su compra - MI EMPRESA S.R.L.
+          Por favor, verifique sus productos antes de retirarse del
+          establecimiento.
+        </Text>
+        <Text
+          style={[
+            styles.footerText,
+            { marginTop: 4, fontFamily: "Helvetica-Bold" },
+          ]}
+        >
+          Forma de Pago: {data.paymentMethod || "Efectivo"}
         </Text>
       </View>
     </Page>
